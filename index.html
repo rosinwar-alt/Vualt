@@ -1,0 +1,2107 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Vault Ledger</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#14171c">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vault Ledger">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#14171c; --panel:#1b1f26; --panel-2:#20252d; --border:#2c323c;
+    --text:#e8e6e1; --muted:#8a8f98;
+    --brass:#c99b4a; --brass-dim:#8c6f3c;
+    --teal:#4a8b8c; --clay:#b4533d;
+    --radius:10px;
+    --font-display:'Fraunces', serif;
+    --font-sans:'IBM Plex Sans', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box}
+  html{ -webkit-tap-highlight-color:transparent }
+  body{
+    margin:0; background:
+      radial-gradient(1200px 600px at 50% -10%, #1c212a 0%, var(--bg) 55%);
+    color:var(--text); font-family:var(--font-sans); min-height:100vh;
+  }
+  ::selection{background:var(--brass); color:#14171c}
+  a{color:var(--teal)}
+  .hidden{display:none !important}
+
+  /* ---------- layout shells ---------- */
+  .screen{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px }
+  .card{
+    width:100%; max-width:420px; background:var(--panel);
+    border:1px solid var(--border); border-radius:var(--radius);
+    padding:32px 28px; box-shadow:0 20px 50px -20px rgba(0,0,0,.6);
+  }
+  .brandmark{
+    font-family:var(--font-display); font-weight:600; font-size:1.6rem;
+    letter-spacing:.01em; text-align:center; margin-bottom:4px;
+  }
+  .brandmark span{color:var(--brass)}
+  .subtitle{ text-align:center; color:var(--muted); font-size:.85rem; margin-bottom:28px }
+
+  label{ display:block; font-size:.78rem; color:var(--muted); margin:14px 0 6px; letter-spacing:.02em }
+  input[type=text], input[type=email], input[type=password], textarea, select{
+    width:100%; background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    padding:11px 12px; border-radius:8px; font-family:var(--font-mono); font-size:.92rem;
+  }
+  input:focus, textarea:focus, select:focus{ outline:2px solid var(--brass-dim); outline-offset:1px }
+  input:disabled, textarea:disabled, select:disabled{ opacity:.55; cursor:not-allowed }
+  textarea{ font-family:var(--font-sans); resize:vertical; min-height:70px }
+
+  button{ font-family:var(--font-sans); cursor:pointer; border:none; border-radius:8px }
+  .btn-primary{
+    width:100%; margin-top:22px; padding:12px; background:var(--brass); color:#14171c;
+    font-weight:600; font-size:.95rem; letter-spacing:.02em; transition:background .15s;
+  }
+  .btn-primary:hover{ background:#dbad5d }
+  .btn-primary:disabled{ opacity:.5; cursor:not-allowed }
+  .btn-ghost{
+    background:transparent; border:1px solid var(--border); color:var(--text); padding:10px 14px; font-size:.85rem;
+  }
+  .btn-ghost:hover{ border-color:var(--brass-dim) }
+  .btn-ghost:disabled{ opacity:.5; cursor:not-allowed }
+  .btn-danger{ background:transparent; color:var(--clay); border:1px solid #4a2c26; padding:8px 12px; font-size:.82rem; display:flex; align-items:center; gap:6px; justify-content:center }
+  .link-btn{ background:none; color:var(--teal); font-size:.85rem; text-decoration:underline; padding:4px }
+  .row-actions{ display:flex; gap:10px; margin-top:22px }
+  .row-actions .btn-primary{ margin-top:0 }
+
+  .error-msg{ color:var(--clay); font-size:.82rem; margin-top:10px; min-height:1em; line-height:1.5 }
+  .status-msg{ font-size:.82rem; line-height:1.5; border-radius:8px; transition:padding .15s, background .15s }
+  .status-msg:empty{ margin:0 }
+  .status-msg.ok{ color:#bfe3e0; background:rgba(74,139,140,.14); border:1px solid rgba(74,139,140,.35); padding:10px 12px; margin-top:12px }
+  .status-msg.err{ color:#f2b9a8; background:rgba(180,83,61,.14); border:1px solid rgba(180,83,61,.35); padding:10px 12px; margin-top:12px }
+  .hint{ color:var(--muted); font-size:.78rem; margin-top:8px; line-height:1.5 }
+  .count-badge{ color:var(--muted); font-size:.85em; opacity:.75 }
+
+  .icon{ width:18px; height:18px; display:inline-block; vertical-align:-4px }
+  .icon svg{ width:100%; height:100%; display:block }
+
+  /* ---------- dial signature (unlock screen) ---------- */
+  .dial-wrap{ display:flex; justify-content:center; margin-bottom:8px }
+  .dial{ width:96px; height:96px; position:relative }
+  .dial svg{ width:100%; height:100% }
+  .dial-ticks{ transform-origin:48px 48px; animation:dial-spin 40s linear infinite }
+  .dial.shake{ animation:dial-shake .4s }
+  @keyframes dial-spin{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
+  @keyframes dial-shake{
+    0%,100%{ transform:translateX(0) } 20%{ transform:translateX(-6px) }
+    40%{ transform:translateX(6px) } 60%{ transform:translateX(-4px) } 80%{ transform:translateX(4px) }
+  }
+  @media (prefers-reduced-motion: reduce){ .dial-ticks{ animation:none } }
+
+  /* ---------- vault (main) screen ---------- */
+  .app{ max-width:760px; margin:0 auto; padding:20px 16px 100px; position:relative }
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; padding:8px 4px 20px;
+    border-bottom:1px solid var(--border); margin-bottom:20px;
+  }
+  .topbar .brandmark{ margin:0; font-size:1.25rem; text-align:left; display:flex; align-items:center; gap:8px }
+  .topbar .brandmark::before{
+    content:''; display:inline-block; width:8px; height:8px; border-radius:50%;
+    background:var(--brass); box-shadow:0 0 10px 1px rgba(201,155,74,.6);
+  }
+  .topbar-actions{ display:flex; gap:8px; align-items:center }
+  .icon-btn{
+    background:var(--panel-2); border:1px solid var(--border); color:var(--muted);
+    width:38px; height:38px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center;
+    padding:0; line-height:0; transition:color .15s, border-color .15s;
+  }
+  .icon-btn:hover{ color:var(--text); border-color:var(--brass-dim) }
+
+  .toolbar{ display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap }
+  .search-input{ flex:1; min-width:160px }
+  .chip-row{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px }
+  .chip{
+    background:var(--panel-2); border:1px solid var(--border); color:var(--muted);
+    padding:6px 13px; border-radius:999px; font-size:.78rem; display:inline-flex; align-items:center; gap:6px;
+  }
+  .chip .icon{ width:14px; height:14px }
+  .chip.active{ background:linear-gradient(155deg, #dbad5d, var(--brass-dim)); color:#14171c; border-color:var(--brass-dim); font-weight:600; box-shadow:0 4px 14px -4px rgba(201,155,74,.5) }
+  .chip-row.type-row{ margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--border) }
+
+  .item-list{ display:flex; flex-direction:column; gap:1px; background:var(--border); border-radius:var(--radius); overflow:hidden; border:1px solid var(--border); box-shadow:0 10px 30px -18px rgba(0,0,0,.5) }
+  .item-row{
+    background:var(--panel); padding:13px 16px; display:flex; align-items:center; gap:12px;
+    cursor:pointer;
+  }
+  .item-row:hover{ background:var(--panel-2) }
+  .item-icon{
+    width:36px; height:36px; border-radius:8px; background:var(--panel-2); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; color:var(--brass); flex-shrink:0;
+    transition:transform .15s, border-color .15s;
+  }
+  .item-row:hover .item-icon{ border-color:var(--brass-dim); transform:scale(1.05) }
+  .item-icon.file-type{ color:var(--teal) }
+  .item-main{ flex:1; min-width:0 }
+  .item-main .platform{ font-weight:600; font-size:.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+  .item-main .username{ font-family:var(--font-mono); color:var(--muted); font-size:.82rem; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+  .item-tag{ font-size:.7rem; color:var(--brass); border:1px solid var(--brass-dim); padding:2px 8px; border-radius:999px; white-space:nowrap; flex-shrink:0; display:inline-flex; align-items:center; gap:4px }
+  .item-tag .icon{ width:11px; height:11px; opacity:.9 }
+  /* หมวดหมู่ต่างกันได้สีต่างกัน (กำหนดตามลำดับหมวดหมู่จริง สม่ำเสมอทุกครั้งที่เปิด ไม่ซ้ำสีติดกัน) */
+  .item-tag.cat-0{ color:#c99b4a; border-color:#8c6f3c }
+  .item-tag.cat-1{ color:#4a8b8c; border-color:#356364 }
+  .item-tag.cat-2{ color:#c9556e; border-color:#8e3c4c }
+  .item-tag.cat-3{ color:#7fa864; border-color:#5a7847 }
+  .item-tag.cat-4{ color:#8578c9; border-color:#5e5390 }
+  .item-tag.cat-5{ color:#c96f9e; border-color:#8e4d6e }
+  .item-tag.cat-6{ color:#5aa0c9; border-color:#3f7190 }
+  .item-tag.cat-7{ color:#c98a4a; border-color:#8f5f2f }
+  .item-tag.cat-8{ color:#6ec9a8; border-color:#3f8f6f }
+  .item-tag.cat-9{ color:#a5a0e8; border-color:#6a64ad }
+  .item-tag.cat-10{ color:#d4c05a; border-color:#948a34 }
+  .item-tag.cat-11{ color:#e0836a; border-color:#a6543e }
+
+  /* ---------- skeleton loading ---------- */
+  .skeleton-row{ background:var(--panel); padding:13px 16px; display:flex; align-items:center; gap:12px }
+  .skeleton-box{
+    background:linear-gradient(90deg, var(--panel-2) 25%, #2a303a 37%, var(--panel-2) 63%);
+    background-size:400% 100%; animation:skeleton-shine 1.4s ease infinite; border-radius:8px;
+  }
+  @keyframes skeleton-shine{ 0%{ background-position:100% 50% } 100%{ background-position:0 50% } }
+  .skeleton-icon{ width:36px; height:36px; border-radius:8px; flex-shrink:0 }
+  .skeleton-lines{ flex:1; display:flex; flex-direction:column; gap:7px }
+  .skeleton-line{ height:11px; border-radius:5px }
+  .skeleton-line.w60{ width:60% }
+  .skeleton-line.w35{ width:35% }
+  @media (prefers-reduced-motion: reduce){ .skeleton-box{ animation:none } }
+
+  .filtered-empty{ text-align:center; padding:40px 16px; color:var(--muted); font-size:.88rem }
+  .filtered-empty .big-icon{ color:var(--brass-dim); opacity:.7; margin-bottom:10px }
+
+  .empty-state{ text-align:center; padding:60px 20px; color:var(--muted) }
+  .empty-state .big-icon{ color:var(--brass-dim); margin-bottom:14px; opacity:.85 }
+  .empty-state .big{ font-family:var(--font-display); font-size:1.3rem; color:var(--text); margin-bottom:6px }
+
+  .fab{
+    position:fixed; right:24px; bottom:24px; width:56px; height:56px; border-radius:50%;
+    background:linear-gradient(155deg, #dbad5d, var(--brass)); color:#14171c; font-size:1.6rem;
+    box-shadow:0 10px 26px -6px rgba(201,155,74,.55), 0 6px 20px rgba(0,0,0,.35);
+    display:flex; align-items:center; justify-content:center; z-index:40; transition:transform .15s, box-shadow .15s;
+  }
+  .fab:hover{ transform:scale(1.06); box-shadow:0 12px 30px -6px rgba(201,155,74,.7), 0 6px 20px rgba(0,0,0,.4) }
+
+  .drop-overlay{
+    position:fixed; inset:0; background:rgba(20,23,28,.88); z-index:45;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    border:3px dashed var(--brass); margin:10px; border-radius:16px;
+  }
+  .drop-overlay .msg{ font-family:var(--font-display); font-size:1.3rem }
+
+  /* ---------- modal ---------- */
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(10,12,15,.7); display:flex; align-items:flex-end;
+    justify-content:center; z-index:50;
+  }
+  .modal{
+    background:var(--panel); border:1px solid var(--border); border-radius:14px 14px 0 0;
+    width:100%; max-width:480px; max-height:88vh; overflow-y:auto; padding:24px;
+    box-shadow:0 30px 70px -20px rgba(0,0,0,.7);
+  }
+  @media (min-width:600px){
+    .modal-backdrop{ align-items:center }
+    .modal{ border-radius:14px }
+  }
+  .modal-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px }
+  .modal-head h2{ font-family:var(--font-display); font-weight:600; font-size:1.2rem; margin:0 }
+  .field-with-btn{ display:flex; gap:6px }
+  .field-with-btn input{ flex:1 }
+  .mini-btn{
+    background:var(--panel-2); border:1px solid var(--border); color:var(--muted); padding:0 12px;
+    border-radius:8px; font-size:.85rem; display:inline-flex; align-items:center; gap:6px; min-height:38px;
+  }
+  .mini-btn:hover{ color:var(--text) }
+
+  .type-toggle{ display:flex; gap:8px; margin-top:6px }
+  .type-btn{
+    flex:1; background:var(--panel-2); border:1px solid var(--border); color:var(--muted);
+    padding:10px; border-radius:8px; font-size:.85rem; display:flex; align-items:center; justify-content:center; gap:7px;
+  }
+  .type-btn.active{ border-color:var(--brass); color:var(--brass); background:#2a2416 }
+
+  .detail-field{ margin-bottom:16px }
+  .detail-field .k{ font-size:.75rem; color:var(--muted); margin-bottom:4px }
+  .detail-field .v{ font-family:var(--font-mono); font-size:.95rem; word-break:break-all }
+  .copy-row{ display:flex; align-items:center; gap:8px }
+
+  .meta-row{ display:flex; gap:16px; flex-wrap:wrap; color:var(--muted); font-size:.72rem; margin:-4px 0 18px }
+  .meta-row span{ display:flex; align-items:center; gap:5px }
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:var(--panel-2); border:1px solid var(--brass-dim); color:var(--text);
+    padding:10px 18px; border-radius:999px; font-size:.85rem; z-index:80; max-width:90vw; text-align:center;
+  }
+
+  .file-attach{ border:1px dashed var(--border); border-radius:8px; padding:12px; margin-top:6px; font-size:.85rem; transition:border-color .15s, background .15s }
+  .file-attach.drag-over{ border-color:var(--brass); background:#241f14 }
+  .file-attach .existing{ display:flex; align-items:center; justify-content:space-between; padding:6px 0; gap:8px }
+  .file-attach .existing span{ display:flex; align-items:center; gap:8px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+  .file-preview{ margin-top:10px }
+  .file-preview img{ max-width:100%; max-height:220px; border-radius:8px; display:block }
+  .file-preview audio, .file-preview video{ width:100%; margin-top:4px; border-radius:8px }
+  .preview-box{ margin-top:12px }
+  .preview-box img{ max-width:100%; border-radius:8px; display:block }
+  .preview-box audio, .preview-box video{ width:100%; border-radius:8px }
+  .text-preview{
+    background:var(--panel-2); border:1px solid var(--border); border-radius:8px;
+    padding:12px; font-family:var(--font-mono); font-size:.8rem; line-height:1.5;
+    white-space:pre-wrap; word-break:break-word; max-height:320px; overflow-y:auto;
+  }
+
+  /* ---------- password strength meter ---------- */
+  .pw-strength{ margin-top:8px }
+  .pw-strength-bar{ height:5px; border-radius:999px; background:var(--panel-2); overflow:hidden; display:flex; gap:3px }
+  .pw-strength-bar i{ flex:1; background:var(--border); border-radius:999px; transition:background .15s }
+  .pw-strength-bar i.on.weak{ background:var(--clay) }
+  .pw-strength-bar i.on.fair{ background:#c98a4a }
+  .pw-strength-bar i.on.good{ background:var(--teal) }
+  .pw-strength-bar i.on.strong{ background:#5fae6a }
+  .pw-strength-label{ font-size:.72rem; color:var(--muted); margin-top:5px }
+  .pw-strength-label.weak{ color:var(--clay) }
+  .pw-strength-label.fair{ color:#c98a4a }
+  .pw-strength-label.good{ color:var(--teal) }
+  .pw-strength-label.strong{ color:#5fae6a }
+
+  /* ---------- pin / favorite ---------- */
+  .pin-btn{
+    background:transparent; border:none; color:var(--border); padding:4px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; transition:color .15s, transform .1s;
+  }
+  .pin-btn:hover{ color:var(--brass-dim); transform:scale(1.1) }
+  .pin-btn.pinned{ color:var(--brass) }
+  .item-row.is-pinned{ background:linear-gradient(90deg, rgba(201,155,74,.07), transparent 60%) }
+  .pin-section-label{ font-size:.72rem; color:var(--muted); letter-spacing:.04em; padding:10px 4px 6px; text-transform:uppercase }
+
+  .chip.preset-chip{ display:inline-flex; align-items:center; gap:6px; cursor:pointer }
+  .chip.preset-chip .preset-x{ display:inline-flex; opacity:.45; transition:opacity .15s }
+  .chip.preset-chip:hover .preset-x{ opacity:.9 }
+  .chip.preset-chip .preset-x svg{ width:11px; height:11px; display:block }
+  .preset-add-row{ display:flex; gap:6px; margin-top:8px }
+  .preset-add-row input{ flex:1 }
+
+  .cat-manage-row{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); gap:10px; flex-wrap:wrap }
+  .cat-manage-row:last-child{ border-bottom:none }
+  .cat-manage-row .name-wrap{ display:flex; align-items:center; gap:8px; min-width:0; flex:1 }
+  .cat-manage-row .name{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.92rem }
+  .cat-manage-actions{ display:flex; gap:6px; flex-shrink:0 }
+  .cat-add-row{ display:flex; gap:8px; margin-top:14px }
+  .cat-add-row input{ flex:1 }
+  .cat-icon-btn{
+    width:30px; height:30px; border-radius:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    background:var(--panel-2); border:1px solid var(--border); color:var(--brass); cursor:pointer; transition:border-color .15s, transform .1s;
+  }
+  .cat-icon-btn:hover{ border-color:var(--brass-dim); transform:scale(1.05) }
+  .icon-picker{
+    display:grid; grid-template-columns:repeat(6, 1fr); gap:6px; margin-top:8px; padding:10px;
+    background:var(--panel-2); border:1px solid var(--border); border-radius:8px; width:100%;
+  }
+  .icon-pick-opt{
+    width:32px; height:32px; border-radius:7px; display:flex; align-items:center; justify-content:center;
+    background:var(--panel); border:1px solid var(--border); color:var(--muted); cursor:pointer; transition:border-color .15s, color .15s;
+  }
+  .icon-pick-opt:hover{ border-color:var(--brass-dim); color:var(--text) }
+  .icon-pick-opt.active{ border-color:var(--brass); color:var(--brass); background:#241f14 }
+
+  footer.settings-block{ margin-top:34px; padding-top:20px; border-top:1px solid var(--border) }
+  footer.settings-block h3{ font-size:.85rem; color:var(--muted); font-weight:500; margin-bottom:10px }
+  footer.settings-block h3.section-gap{ margin-top:24px }
+  .settings-actions{ display:flex; gap:10px; flex-wrap:wrap }
+
+  .credit-line{ text-align:center; color:var(--muted); font-size:.68rem; letter-spacing:.03em; margin-top:22px; opacity:.75 }
+  .credit-line span{ color:#e8c374; font-weight:700; letter-spacing:.05em; font-size:.85rem; opacity:1; text-shadow:0 0 14px rgba(201,155,74,.35) }
+
+  /* ---------- polish: entrance + micro-interactions ---------- */
+  @media (prefers-reduced-motion: no-preference){
+    .card{ animation:card-in .35s cubic-bezier(.16,1,.3,1) }
+    .item-row{ animation:row-in .25s cubic-bezier(.16,1,.3,1) }
+  }
+  @keyframes card-in{ from{ opacity:0; transform:translateY(8px) } to{ opacity:1; transform:none } }
+  @keyframes row-in{ from{ opacity:0; transform:translateY(4px) } to{ opacity:1; transform:none } }
+  .item-row{ transition:background .12s }
+  .item-row:active{ background:var(--panel-2) }
+  .chip{ transition:background .15s, color .15s, border-color .15s }
+  .btn-primary, .btn-ghost, .btn-danger, .mini-btn, .icon-btn, .fab, .type-btn{ transition:background .15s, border-color .15s, color .15s, transform .1s }
+  .fab:active{ transform:scale(.94) }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, .item-row:focus-visible{
+    outline:2px solid var(--brass); outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ CONFIG SCREEN ============ -->
+<div id="screen-config" class="screen hidden">
+  <div class="card">
+    <div class="brandmark">Vault <span>Ledger</span></div>
+    <p class="hint" style="text-align:center">
+      ยังไม่ได้ใส่ค่าเชื่อมต่อ Supabase — เปิดไฟล์ index.html ด้วยโปรแกรมแก้ไขข้อความ
+      แล้วแก้บรรทัด <code>SUPABASE_URL</code> และ <code>SUPABASE_ANON_KEY</code>
+      ที่ด้านบนของสคริปต์ (หาได้ใน Supabase Dashboard → Project Settings → API)
+    </p>
+  </div>
+</div>
+
+<!-- ============ AUTH SCREEN ============ -->
+<div id="screen-auth" class="screen hidden">
+  <div class="card">
+    <div class="brandmark">Vault <span>Ledger</span></div>
+    <p class="subtitle" id="auth-subtitle">เข้าสู่ระบบเพื่อเปิดตู้เซฟของคุณ</p>
+
+    <label for="auth-email">อีเมล</label>
+    <input type="email" id="auth-email" autocomplete="email">
+
+    <label for="auth-password">รหัสผ่านบัญชี</label>
+    <input type="password" id="auth-password" autocomplete="current-password">
+
+    <button class="btn-primary" id="btn-auth-submit">เข้าสู่ระบบ</button>
+    <p class="status-msg" id="auth-status"></p>
+    <p style="text-align:center; margin-top:6px">
+      <button class="link-btn hidden" id="btn-resend-confirm">ส่งอีเมลยืนยันอีกครั้ง</button>
+    </p>
+    <p style="text-align:center; margin-top:8px">
+      <button class="link-btn" id="btn-auth-toggle">ยังไม่มีบัญชี? สมัครใหม่</button>
+    </p>
+    <div class="credit-line">Developed by <span>Alexander_Weng</span></div>
+  </div>
+</div>
+
+<!-- ============ MASTER PASSWORD SCREEN ============ -->
+<div id="screen-master" class="screen hidden">
+  <div class="card">
+    <div class="dial-wrap">
+      <div class="dial" id="dial-el">
+        <svg viewBox="0 0 96 96">
+          <circle cx="48" cy="48" r="44" fill="none" stroke="#2c323c" stroke-width="2"/>
+          <g class="dial-ticks" stroke="#c99b4a" stroke-width="2">
+            <line x1="48" y1="6" x2="48" y2="14"/>
+            <line x1="48" y1="82" x2="48" y2="90" stroke="#4a4a4a"/>
+            <line x1="6" y1="48" x2="14" y2="48" stroke="#4a4a4a"/>
+            <line x1="82" y1="48" x2="90" y2="48" stroke="#4a4a4a"/>
+            <line x1="16.7" y1="16.7" x2="22.6" y2="22.6" stroke="#4a4a4a"/>
+            <line x1="73.4" y1="73.4" x2="79.3" y2="79.3" stroke="#4a4a4a"/>
+            <line x1="16.7" y1="79.3" x2="22.6" y2="73.4" stroke="#4a4a4a"/>
+            <line x1="73.4" y1="22.6" x2="79.3" y2="16.7" stroke="#4a4a4a"/>
+          </g>
+          <circle cx="48" cy="48" r="5" fill="#c99b4a"/>
+        </svg>
+      </div>
+    </div>
+    <div class="brandmark" id="master-title">ตั้งรหัสหลัก</div>
+    <p class="subtitle" id="master-subtitle">รหัสหลักนี้ใช้ปลดล็อกข้อมูลเท่านั้น ไม่ถูกส่งขึ้นเซิร์ฟเวอร์</p>
+
+    <label for="master-pass1" id="master-label1">รหัสหลัก (Master Password)</label>
+    <input type="password" id="master-pass1" autocomplete="new-password">
+
+    <div id="master-confirm-wrap">
+      <label for="master-pass2">ยืนยันรหัสหลักอีกครั้ง</label>
+      <input type="password" id="master-pass2" autocomplete="new-password">
+    </div>
+
+    <button class="btn-primary" id="btn-master-submit">ปลดล็อก</button>
+    <p class="error-msg" id="master-error"></p>
+    <p class="hint" id="master-warning"></p>
+  </div>
+</div>
+
+<!-- ============ MAIN APP ============ -->
+<div id="screen-app" class="app hidden">
+  <div class="topbar">
+    <div class="brandmark">Vault <span>Ledger</span></div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="btn-lock" title="ล็อกวอลต์"></button>
+      <button class="icon-btn" id="btn-signout" title="ออกจากระบบ"></button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" class="search-input" id="search-input" placeholder="ค้นหา platform, username หรือ note...">
+  </div>
+  <div class="chip-row type-row" id="type-chips"></div>
+  <div class="chip-row" id="category-chips"></div>
+
+  <div id="item-list" class="item-list"></div>
+  <div id="empty-state" class="empty-state hidden">
+    <div class="big-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="40" height="40" style="margin:0 auto">
+        <rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+      </svg>
+    </div>
+    <div class="big">ยังไม่มีรายการ</div>
+    <div>กดปุ่ม + ด้านล่าง หรือลากไฟล์มาวางเพื่อเพิ่มรายการแรก</div>
+  </div>
+
+  <footer class="settings-block">
+    <h3>หมวดหมู่</h3>
+    <div class="settings-actions">
+      <button class="btn-ghost" id="btn-manage-categories">จัดการหมวดหมู่</button>
+    </div>
+
+    <h3 class="section-gap">พื้นที่จัดเก็บ</h3>
+    <div class="settings-actions">
+      <button class="btn-ghost" id="btn-storage-usage">ดูพื้นที่ใช้งาน</button>
+    </div>
+
+    <h3 class="section-gap">สำรอง / กู้คืนข้อมูล</h3>
+    <div class="settings-actions">
+      <button class="btn-ghost" id="btn-export">ดาวน์โหลดไฟล์สำรอง (เข้ารหัสแล้ว)</button>
+      <button class="btn-ghost" id="btn-import">นำเข้าไฟล์สำรอง</button>
+      <input type="file" id="import-file-input" accept="application/json" class="hidden">
+    </div>
+
+    <h3 class="section-gap">รหัสหลัก (Master Password)</h3>
+    <div class="settings-actions">
+      <button class="btn-ghost" id="btn-change-master">เปลี่ยนรหัสหลัก</button>
+    </div>
+  </footer>
+  <div class="credit-line">Developed by <span>Alexander_Weng</span></div>
+
+  <button class="fab" id="btn-add" title="เพิ่มรายการ"></button>
+</div>
+
+<!-- ============ ITEM MODAL ============ -->
+<div id="modal-backdrop" class="modal-backdrop hidden">
+  <div class="modal" id="modal-body"></div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script>
+/* =====================================================================
+   1) ตั้งค่าการเชื่อมต่อ Supabase
+===================================================================== */
+const SUPABASE_URL = 'https://wtarnomjsannddanmovs.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0YXJub21qc2FubmRkYW5tb3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczOTM0NjcsImV4cCI6MjEwMjk2OTQ2N30.xGtIGmM1cK-gPsedWbiayk-ib4o68bjPli8AvpE2G7U';
+const STORAGE_BUCKET = 'vault-files';
+
+const supabaseReady = SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY';
+const sb = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+/* =====================================================================
+   2) Icons — inline SVG (ไม่ใช้ emoji เพราะบางเครื่อง/บางฟอนต์ render เป็นสี่เหลี่ยม)
+===================================================================== */
+const ICON_PATHS = {
+  lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  power: '<path d="M12 3v8"/><path d="M6.5 6.5a8 8 0 1 0 11 0"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  close: '<path d="M6 6l12 12M18 6L6 18"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+  chat: '<path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.4 8.4 0 0 1 12.5 3a8.5 8.5 0 0 1 8.5 8.5z"/>',
+  code: '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+  controller: '<rect x="2" y="8" width="20" height="9" rx="4"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="16" cy="11" r="1"/><circle cx="18.5" cy="13.5" r="1"/>',
+  image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/>',
+  music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+  video: '<rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10l6-3v10l-6-3"/>',
+  doc: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/>',
+  bank: '<path d="M3 10l9-6 9 6"/><path d="M4 10v9M9 10v9M15 10v9M20 10v9"/><path d="M2 21h20"/>',
+  clip: '<path d="M21 12.5l-8.5 8.5a4.5 4.5 0 0 1-6.4-6.4l9-9a3 3 0 0 1 4.2 4.2l-8.9 8.9a1.5 1.5 0 0 1-2.1-2.1l8-8"/>',
+  pencil: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  trash: '<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>',
+  key: '<circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.5 12.5L21 2M21 2v5M21 2h-5"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>',
+  folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  storage: '<rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="9" width="7" height="12" rx="1"/>',
+  pin: '<path d="M12 2l1.5 5.5L19 9l-4.5 3L16 18l-4-3.2L8 18l1.5-6L5 9l5.5-1.5z"/>',
+  eyeoff: '<path d="M3 3l18 18"/><path d="M10.6 5.1A9.9 9.9 0 0 1 12 5c5 0 9 4.5 10 7-.5 1.1-1.3 2.4-2.4 3.6M6.5 6.5C4.3 8 2.9 10 2 12c1.3 3 5 7 10 7 1.4 0 2.7-.3 3.9-.8"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+  crosshair: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>',
+  shield: '<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/>',
+  disc: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/>',
+  cart: '<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3h3l2.6 12.6a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 7H6"/>',
+  cloud: '<path d="M7 18a4.5 4.5 0 0 1-.5-8.97A5.5 5.5 0 0 1 17 8.5a4 4 0 0 1-1 7.9H7z"/>',
+  tag: '<path d="M20 12l-8 8-9-9V4h7z"/><circle cx="7.5" cy="7.5" r="1.2"/>',
+  star: '<path d="M12 2.5l2.9 6.4 6.9.7-5.2 4.7 1.5 6.9L12 17.6l-6.1 3.6 1.5-6.9-5.2-4.7 6.9-.7z"/>',
+  card: '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+  camera: '<path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/>',
+};
+function iconSvg(name, size){
+  size = size || 18;
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="${size}" height="${size}">${ICON_PATHS[name]||ICON_PATHS.globe}</svg>`;
+}
+function iconWrap(name, size){ return `<span class="icon" style="width:${size||18}px;height:${size||18}px">${iconSvg(name, size||18)}</span>`; }
+
+document.getElementById('btn-lock').innerHTML = iconWrap('lock', 17);
+document.getElementById('btn-signout').innerHTML = iconWrap('power', 17);
+document.getElementById('btn-add').innerHTML = iconSvg('plus', 26);
+document.getElementById('btn-manage-categories').innerHTML = iconWrap('folder', 15) + ' จัดการหมวดหมู่';
+document.getElementById('btn-storage-usage').innerHTML = iconWrap('storage', 15) + ' ดูพื้นที่ใช้งาน';
+document.getElementById('btn-change-master').innerHTML = iconWrap('key', 15) + ' เปลี่ยนรหัสหลัก';
+
+/* กติกาเลือกไอคอนจาก platform — เรียงจากเจาะจงสุดไปกว้างสุด เกมแยกเป็นหลายกลุ่มย่อย
+   กันสับสนเวลามีหลายเกมในลิสต์เดียวกัน (ยิงปืน / MOBA / เครื่องคอนโซล / อื่นๆ) */
+const PLATFORM_ICON_RULES = [
+  [['gmail','google','outlook','hotmail','yahoo','mail','อีเมล','icloud','apple id'], 'mail'],
+  [['facebook','line','messenger','discord','telegram','whatsapp','instagram','twitter','x.com','tiktok','wechat','snapchat'], 'chat'],
+  [['github','gitlab','vercel','netlify','aws','server','hosting','domain','cloudflare'], 'code'],
+  [['icloud drive','google drive','dropbox','onedrive','storage','cloud'], 'cloud'],
+  [['netflix','disney','viu','youtube premium','spotify','apple music','joox','hbo','viu','streaming'], 'video'],
+  [['shopee','lazada','amazon','ebay','shop','ตลาด','ซื้อของ'], 'cart'],
+  [['bank','ธนาคาร','kbank','scb','bualuang','krungsri','ktb','promptpay','truemoney','บัตรเครดิต','credit card'], 'bank'],
+  // เกม: แยกย่อยตามแนวเกม กันหลายเกมกองไอคอนเดียวกันจนแยกไม่ออก
+  [['valorant','cs2','counter-strike','pubg','apex','fortnite','call of duty','warzone','overwatch','แนวยิง'], 'crosshair'],
+  [['league of legends','dota','mobile legends','wild rift','ror','arena of valor','rov','moba'], 'shield'],
+  [['playstation','psn','xbox','nintendo','switch','คอนโซล'], 'disc'],
+  [['steam','epic games','riot','battle.net','origin','ea app','เกม','game'], 'controller'],
+  [['badge','achievement','vip','สมาชิก','membership'], 'star'],
+];
+function iconForItem(item){
+  if (item.type === 'file'){
+    const m = item._mime || '';
+    if (m.startsWith('image/')) return 'image';
+    if (m.startsWith('audio/')) return 'music';
+    if (m.startsWith('video/')) return 'video';
+    return 'doc';
+  }
+  // ถ้าหมวดหมู่ของรายการนี้ถูกตั้งไอคอนไว้เอง (จากหน้า "จัดการหมวดหมู่") ให้ใช้อันนั้นก่อนเสมอ
+  if (item.category){
+    const cat = categories.find(c => c.name === item.category);
+    if (cat && cat.icon_key) return cat.icon_key;
+  }
+  const p = (item.platform || '').toLowerCase();
+  for (const [words, key] of PLATFORM_ICON_RULES){
+    if (words.some(w => p.includes(w))) return key;
+  }
+  return 'globe';
+}
+
+/* =====================================================================
+   3) Crypto helpers
+===================================================================== */
+const enc = new TextEncoder();
+const dec = new TextDecoder();
+
+function bufToB64(buf){
+  const bytes = new Uint8Array(buf);
+  let bin = '';
+  for (let i=0;i<bytes.length;i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+function b64ToBuf(b64){
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  return bytes.buffer;
+}
+function randomBytes(len){
+  const a = new Uint8Array(len);
+  crypto.getRandomValues(a);
+  return a;
+}
+async function deriveKey(password, saltB64){
+  const salt = b64ToBuf(saltB64);
+  const baseKey = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name:'PBKDF2', salt, iterations:150000, hash:'SHA-256' },
+    baseKey, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']
+  );
+}
+async function encryptText(key, plaintext){
+  const iv = randomBytes(12);
+  const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, key, enc.encode(plaintext));
+  return { iv: bufToB64(iv), data: bufToB64(ct) };
+}
+async function decryptText(key, ivB64, dataB64){
+  const iv = new Uint8Array(b64ToBuf(ivB64));
+  const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv}, key, b64ToBuf(dataB64));
+  return dec.decode(pt);
+}
+async function encryptBuffer(key, buf){
+  const iv = randomBytes(12);
+  const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, key, buf);
+  return { iv: bufToB64(iv), data: ct };
+}
+async function decryptBuffer(key, ivB64, buf){
+  const iv = new Uint8Array(b64ToBuf(ivB64));
+  return crypto.subtle.decrypt({name:'AES-GCM', iv}, key, buf);
+}
+
+/* =====================================================================
+   4) State
+===================================================================== */
+let currentUser = null;
+let vaultKey = null;
+let vaultSettings = null;
+let items = [];
+let categories = []; // [{id, name}] จากตาราง vault_categories
+let activeCategory = null;
+let activeType = null; // null | 'credential' | 'file'
+let editingItemId = null;
+let pendingFiles = [];      // ไฟล์ใหม่ที่ยังไม่ได้อัปโหลด (แนบได้หลายไฟล์ต่อ 1 รายการ)
+let existingFormFiles = []; // ไฟล์เดิมของรายการที่กำลังแก้ไข (แถวจาก vault_files)
+let formType = 'credential';
+let dragCounter = 0;
+let lockTimer = null;
+const AUTO_LOCK_MS = 5 * 60 * 1000; // 5 นาทีไม่มีการใช้งาน → ล็อกอัตโนมัติ
+let clipboardClearToken = 0;
+
+const els = id => document.getElementById(id);
+function showScreen(id){
+  ['screen-config','screen-auth','screen-master','screen-app'].forEach(s=>{
+    els(s).classList.toggle('hidden', s !== id);
+  });
+}
+function showToast(msg, ms){
+  const t = els('toast');
+  t.textContent = msg;
+  t.classList.remove('hidden');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>t.classList.add('hidden'), ms || 2600);
+}
+
+/* ---------- แจ้งเตือน backup เป็นระยะ ---------- */
+function backupStorageKey(){ return 'vaultledger_last_backup_' + (currentUser ? currentUser.id : ''); }
+function checkBackupReminder(){
+  const last = localStorage.getItem(backupStorageKey());
+  const days = last ? Math.floor((Date.now() - Number(last)) / 86400000) : null;
+  if (days === null){
+    setTimeout(() => showToast('ยังไม่เคยดาวน์โหลดไฟล์สำรองเลย — แนะนำสำรองข้อมูลไว้กันลืม master password', 5000), 900);
+  } else if (days >= 30){
+    setTimeout(() => showToast(`ยังไม่ได้สำรองข้อมูลมา ${days} วันแล้ว — แนะนำกดดาวน์โหลดไฟล์สำรองใหม่`, 5000), 900);
+  }
+}
+function markBackupDone(){ localStorage.setItem(backupStorageKey(), String(Date.now())); }
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s){ return String(s).replace(/'/g, "&#39;"); }
+function fmtDate(iso){
+  if (!iso) return '-';
+  try{ return new Date(iso).toLocaleString('th-TH', { dateStyle:'medium', timeStyle:'short' }); }
+  catch(e){ return iso; }
+}
+
+/* =====================================================================
+   5) Boot
+===================================================================== */
+async function boot(){
+  if (!supabaseReady){ showScreen('screen-config'); return; }
+  const { data:{ session } } = await sb.auth.getSession();
+  if (session){ currentUser = session.user; await afterLogin(); }
+  else showScreen('screen-auth');
+}
+sb?.auth.onAuthStateChange((event) => { if (event === 'SIGNED_OUT') resetToAuth(); });
+function resetToAuth(){
+  currentUser = null; vaultKey = null; vaultSettings = null; items = []; categories = []; activeCategory = null;
+  showScreen('screen-auth');
+}
+
+/* =====================================================================
+   6) Auth screen (สมัคร/เข้าสู่ระบบ — กันกดซ้ำ + แจ้งสถานะชัดเจน)
+===================================================================== */
+let authMode = 'signin';
+let authBusy = false;
+
+els('btn-auth-toggle')?.addEventListener('click', ()=>{
+  authMode = authMode === 'signin' ? 'signup' : 'signin';
+  els('auth-subtitle').textContent = authMode === 'signin' ? 'เข้าสู่ระบบเพื่อเปิดตู้เซฟของคุณ' : 'สร้างบัญชีใหม่';
+  els('btn-auth-submit').textContent = authMode === 'signin' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+  els('btn-auth-toggle').textContent = authMode === 'signin' ? 'ยังไม่มีบัญชี? สมัครใหม่' : 'มีบัญชีแล้ว? เข้าสู่ระบบ';
+  setAuthStatus('');
+  els('btn-resend-confirm').classList.add('hidden');
+});
+
+function setAuthStatus(msg, kind){
+  const el = els('auth-status');
+  el.textContent = msg || '';
+  el.className = 'status-msg' + (kind ? ' ' + kind : '');
+  els('btn-resend-confirm')?.classList.add('hidden');
+}
+let lastUnconfirmedEmail = '';
+els('btn-resend-confirm')?.addEventListener('click', async ()=>{
+  if (!lastUnconfirmedEmail) return;
+  const btn = els('btn-resend-confirm');
+  btn.disabled = true;
+  const { error } = await sb.auth.resend({ type:'signup', email: lastUnconfirmedEmail });
+  btn.disabled = false;
+  if (error){ showToast('ส่งอีเมลไม่สำเร็จ: ' + error.message); return; }
+  showToast('ส่งอีเมลยืนยันอีกครั้งแล้ว เช็คกล่องจดหมาย');
+});
+
+els('btn-auth-submit')?.addEventListener('click', async ()=>{
+  if (authBusy) return; // กันกดรัวๆ
+  const email = els('auth-email').value.trim();
+  const password = els('auth-password').value;
+  setAuthStatus('');
+  if (!email || !password){ setAuthStatus('กรอกอีเมลและรหัสผ่านให้ครบ', 'err'); return; }
+
+  authBusy = true;
+  const btn = els('btn-auth-submit');
+  btn.disabled = true;
+  els('auth-email').disabled = true;
+  els('auth-password').disabled = true;
+  els('btn-auth-toggle').disabled = true;
+  const originalLabel = btn.textContent;
+  btn.textContent = authMode === 'signin' ? 'กำลังเข้าสู่ระบบ...' : 'กำลังสมัคร...';
+
+  try{
+    if (authMode === 'signin'){
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error){
+        if (/email not confirmed/i.test(error.message)){
+          setAuthStatus('อีเมลนี้ยังไม่ได้ยืนยัน — เปิดกล่องจดหมายแล้วกดลิงก์ยืนยันก่อน จึงจะเข้าสู่ระบบได้', 'err');
+          lastUnconfirmedEmail = email;
+          els('btn-resend-confirm').classList.remove('hidden');
+        } else if (/invalid login credentials/i.test(error.message)){
+          setAuthStatus('อีเมลหรือรหัสผ่านไม่ถูกต้อง', 'err');
+        } else {
+          setAuthStatus('เข้าสู่ระบบไม่สำเร็จ: ' + error.message, 'err');
+        }
+        showToast('เข้าสู่ระบบไม่สำเร็จ');
+        return;
+      }
+      currentUser = data.user;
+      showToast('เข้าสู่ระบบสำเร็จ');
+      await afterLogin();
+    } else {
+      const { data, error } = await sb.auth.signUp({ email, password });
+      if (error){
+        if (/already registered|already exists/i.test(error.message)){
+          setAuthStatus('อีเมลนี้สมัครไปแล้ว ลองกด "มีบัญชีแล้ว? เข้าสู่ระบบ" แทน', 'err');
+        } else {
+          setAuthStatus('สมัครไม่สำเร็จ: ' + error.message, 'err');
+        }
+        showToast('สมัครสมาชิกไม่สำเร็จ');
+        return;
+      }
+      // Supabase ส่ง user object กลับมาแม้บัญชีจะซ้ำอยู่แล้วแต่ยังไม่ยืนยัน (ไม่ error) —
+      // เช็ค identities ว่างเพื่อจับเคสนี้ ไม่งั้นผู้ใช้จะเข้าใจว่าสมัครใหม่สำเร็จทั้งที่จริงเป็นบัญชีเดิม
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0){
+        setAuthStatus('อีเมลนี้สมัครไปแล้วแต่ยังไม่ยืนยัน — เช็คกล่องจดหมาย หรือกดปุ่มด้านล่างเพื่อส่งอีเมลยืนยันอีกครั้ง', 'err');
+        lastUnconfirmedEmail = email;
+        els('btn-resend-confirm').classList.remove('hidden');
+        showToast('บัญชีนี้มีอยู่แล้ว รอยืนยันอีเมล');
+        return;
+      }
+      if (!data.session){
+        setAuthStatus('สมัครสำเร็จ! ระบบส่งอีเมลยืนยันไปที่ ' + email + ' แล้ว — เปิดอีเมลกดลิงก์ยืนยันก่อน แล้วค่อยกลับมาเข้าสู่ระบบ', 'ok');
+        showToast('สมัครสำเร็จ เช็คอีเมลเพื่อยืนยัน');
+        lastUnconfirmedEmail = email;
+        els('btn-resend-confirm').classList.remove('hidden');
+        authMode = 'signin';
+        els('auth-subtitle').textContent = 'เข้าสู่ระบบเพื่อเปิดตู้เซฟของคุณ';
+        els('btn-auth-toggle').textContent = 'ยังไม่มีบัญชี? สมัครใหม่';
+        btn.textContent = 'เข้าสู่ระบบ';
+        return;
+      }
+      currentUser = data.user;
+      showToast('สมัครสำเร็จ');
+      await afterLogin();
+    }
+  } finally {
+    authBusy = false;
+    btn.disabled = false;
+    els('auth-email').disabled = false;
+    els('auth-password').disabled = false;
+    els('btn-auth-toggle').disabled = false;
+    if (btn.textContent === 'กำลังเข้าสู่ระบบ...' || btn.textContent === 'กำลังสมัคร...'){
+      btn.textContent = originalLabel;
+    }
+  }
+});
+
+async function afterLogin(){
+  const { data, error } = await sb.from('vault_settings').select('*').eq('user_id', currentUser.id).maybeSingle();
+  if (error){ showToast('โหลดข้อมูลไม่สำเร็จ: ' + error.message); return; }
+  vaultSettings = data;
+  showMasterScreen();
+}
+
+/* =====================================================================
+   7) Master password screen
+===================================================================== */
+function showMasterScreen(){
+  const isSetup = !vaultSettings;
+  els('master-title').textContent = isSetup ? 'ตั้งรหัสหลัก' : 'ปลดล็อกวอลต์';
+  els('master-subtitle').textContent = isSetup
+    ? 'รหัสนี้จะใช้เข้ารหัสข้อมูลทั้งหมด ไม่ถูกส่งขึ้นเซิร์ฟเวอร์ และไม่มีทางกู้คืนถ้าลืม'
+    : 'ใส่รหัสหลักเพื่อถอดรหัสข้อมูลของคุณ';
+  els('master-label1').textContent = isSetup ? 'ตั้งรหัสหลักใหม่' : 'รหัสหลัก (Master Password)';
+  els('master-confirm-wrap').classList.toggle('hidden', !isSetup);
+  els('master-warning').textContent = isSetup ? 'เก็บรหัสนี้ไว้ให้ดี ถ้าลืมจะกู้ข้อมูลคืนไม่ได้เลย' : '';
+  els('master-pass1').value = ''; els('master-pass2').value = '';
+  els('master-error').textContent = '';
+  showScreen('screen-master');
+}
+
+let masterBusy = false;
+els('btn-master-submit')?.addEventListener('click', async ()=>{
+  if (masterBusy) return;
+  const p1 = els('master-pass1').value;
+  const p2 = els('master-pass2').value;
+  els('master-error').textContent = '';
+  masterBusy = true;
+  const btn = els('btn-master-submit');
+  btn.disabled = true;
+  try{
+    if (!vaultSettings){
+      if (p1.length < 6){ els('master-error').textContent = 'รหัสหลักควรยาวอย่างน้อย 6 ตัว'; return; }
+      if (p1 !== p2){ els('master-error').textContent = 'รหัสหลักไม่ตรงกัน'; return; }
+      const salt = bufToB64(randomBytes(16));
+      const key = await deriveKey(p1, salt);
+      const verifierPack = await encryptText(key, 'VAULT_OK');
+      const { error } = await sb.from('vault_settings').insert({
+        user_id: currentUser.id, salt, verifier: verifierPack.data, verifier_iv: verifierPack.iv
+      });
+      if (error){ els('master-error').textContent = 'ตั้งรหัสไม่สำเร็จ: ' + error.message; return; }
+      vaultSettings = { salt, verifier: verifierPack.data, verifier_iv: verifierPack.iv };
+      vaultKey = key;
+      await enterVault();
+    } else {
+      try{
+        const key = await deriveKey(p1, vaultSettings.salt);
+        const check = await decryptText(key, vaultSettings.verifier_iv, vaultSettings.verifier);
+        if (check !== 'VAULT_OK') throw new Error('mismatch');
+        vaultKey = key;
+        await enterVault();
+      } catch(e){
+        els('master-error').textContent = 'รหัสหลักไม่ถูกต้อง';
+        const d = els('dial-el'); d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake');
+      }
+    }
+  } finally {
+    masterBusy = false;
+    btn.disabled = false;
+  }
+});
+
+/* =====================================================================
+   8) Vault: load + render
+===================================================================== */
+async function enterVault(){
+  showScreen('screen-app');
+  renderSkeleton();
+  await loadCategories();
+  await loadItems();
+  await hydrateFileMimeCache();
+  resetLockTimer();
+  checkBackupReminder();
+}
+
+function renderSkeleton(count){
+  count = count || 5;
+  const container = els('item-list');
+  if (!container) return;
+  els('empty-state')?.classList.add('hidden');
+  let html = '';
+  for (let i=0;i<count;i++){
+    html += `<div class="skeleton-row">
+      <div class="skeleton-box skeleton-icon"></div>
+      <div class="skeleton-lines">
+        <div class="skeleton-box skeleton-line w60"></div>
+        <div class="skeleton-box skeleton-line w35"></div>
+      </div>
+    </div>`;
+  }
+  container.innerHTML = html;
+}
+
+/* ---------- auto-lock เมื่อไม่มีการใช้งาน ---------- */
+function resetLockTimer(){
+  clearTimeout(lockTimer);
+  if (!vaultKey) return;
+  lockTimer = setTimeout(() => {
+    if (vaultKey){
+      vaultKey = null; items = [];
+      showMasterScreen();
+      showToast('ล็อกอัตโนมัติ — ไม่มีการใช้งานเกิน 5 นาที');
+    }
+  }, AUTO_LOCK_MS);
+}
+['mousemove','mousedown','keydown','touchstart','scroll'].forEach(evt => {
+  document.addEventListener(evt, () => { if (vaultKey) resetLockTimer(); }, { passive:true });
+});
+
+async function loadCategories(){
+  const { data, error } = await sb.from('vault_categories').select('*').eq('user_id', currentUser.id);
+  if (error){ categories = []; return; }
+  categories = [];
+  for (const row of (data||[])){
+    try{
+      const name = await decryptText(vaultKey, row.name_iv, row.encrypted_name);
+      // icon_key เก็บแบบไม่เข้ารหัส (แค่ชื่อไอคอนทั่วไป เช่น "controller" ไม่ใช่ข้อมูลส่วนตัว)
+      categories.push({ id: row.id, name, icon_key: row.icon_key || '' });
+    } catch(e){ /* ข้ามแถวที่ถอดรหัสไม่ได้ */ }
+  }
+  categories.sort((a,b)=> a.name.localeCompare(b.name, 'th'));
+}
+
+function allCategoryNames(){
+  // รวมหมวดหมู่ที่สร้างไว้ล่วงหน้า + หมวดหมู่เก่าที่พิมพ์ไว้ตรงๆ ในรายการ (ย้อนหลังให้เข้ากันได้)
+  const names = new Set(categories.map(c => c.name));
+  items.forEach(i => { if (i.category) names.add(i.category); });
+  return [...names].sort((a,b)=> a.localeCompare(b, 'th'));
+}
+
+let fileMimeCache = {}; // vault_item_id -> mime (สำหรับไอคอนในลิสต์)
+async function hydrateFileMimeCache(){
+  fileMimeCache = {};
+  const fileItems = items.filter(i => i.type === 'file');
+  if (!fileItems.length) return;
+  const { data: files } = await sb.from('vault_files').select('vault_item_id, encrypted_name, name_iv').in('vault_item_id', fileItems.map(i=>i.id));
+  if (!files) return;
+  for (const f of files){
+    try{
+      const raw = await decryptText(vaultKey, f.name_iv, f.encrypted_name);
+      const parsed = JSON.parse(raw);
+      fileMimeCache[f.vault_item_id] = parsed.mime || '';
+    } catch(e){ /* backward-compat: name only, ไม่มี mime */ }
+  }
+  items.forEach(i => { if (i.type === 'file') i._mime = fileMimeCache[i.id] || ''; });
+  renderList();
+}
+
+async function loadItems(){
+  const { data, error } = await sb.from('vault_items').select('*').eq('user_id', currentUser.id).order('created_at', {ascending:false});
+  if (error){ showToast('โหลดรายการไม่สำเร็จ: ' + error.message); return; }
+  items = [];
+  for (const row of data){
+    try{
+      const json = await decryptText(vaultKey, row.iv, row.encrypted_data);
+      const obj = JSON.parse(json);
+      items.push({ id: row.id, created_at: row.created_at, updated_at: row.updated_at, type: obj.type || 'credential', ...obj });
+    } catch(e){ /* ข้ามแถวที่ถอดรหัสไม่ได้ */ }
+  }
+  // กันบัค: ถ้าหมวดหมู่ที่เลือกอยู่ไม่มีรายการเหลือแล้ว (เช่นเพิ่งลบรายการสุดท้ายในหมวดนั้น)
+  // ต้องรีเซ็ตกลับเป็น "ทุกหมวดหมู่" ไม่งั้น filter จะเหลือ 0 รายการค้างจนกว่าจะรีเฟรช
+  const currentCatNames = new Set(allCategoryNames());
+  if (activeCategory && !currentCatNames.has(activeCategory)) activeCategory = null;
+  renderTypeChips();
+  renderCategories();
+  renderList();
+}
+
+function renderTypeChips(){
+  const wrap = els('type-chips');
+  const defs = [
+    { key:null, label:'ทั้งหมด', icon:null },
+    { key:'credential', label:'พาสเวิด', icon:'key' },
+    { key:'file', label:'ไฟล์แนบ', icon:'clip' },
+  ];
+  wrap.innerHTML = defs.map(d => `
+    <button class="chip type-chip ${activeType===d.key?'active':''}" data-key="${d.key===null?'':d.key}">
+      ${d.icon ? iconWrap(d.icon,14) : ''}${d.label}
+    </button>`).join('');
+  wrap.querySelectorAll('.type-chip').forEach(btn=>{
+    btn.onclick = () => {
+      activeType = btn.dataset.key || null;
+      renderTypeChips(); renderList();
+    };
+  });
+}
+
+function renderCategories(){
+  const cats = allCategoryNames();
+  const wrap = els('category-chips');
+  wrap.innerHTML = '';
+  if (cats.length === 0) return;
+  const allChip = document.createElement('button');
+  allChip.className = 'chip' + (activeCategory === null ? ' active' : '');
+  allChip.textContent = `ทุกหมวดหมู่ (${items.length})`;
+  allChip.onclick = () => { activeCategory = null; renderCategories(); renderList(); };
+  wrap.appendChild(allChip);
+  cats.forEach(c => {
+    const count = items.filter(i => i.category === c).length;
+    const chip = document.createElement('button');
+    chip.className = 'chip' + (activeCategory === c ? ' active' : '');
+    chip.innerHTML = `${categoryTagIcon(c)}${escapeHtml(c)} <span class="count-badge">(${count})</span>`;
+    chip.onclick = () => { activeCategory = c; renderCategories(); renderList(); };
+    wrap.appendChild(chip);
+  });
+}
+
+function categoryTagIcon(name){
+  const cat = categories.find(c => c.name === name);
+  if (cat && cat.icon_key) return `<span class="icon">${iconSvg(cat.icon_key, 11)}</span>`;
+  return '';
+}
+
+const CATEGORY_COLOR_COUNT = 12;
+function categoryColorClass(name){
+  if (!name) return '';
+  // FNV-1a-ish mix ให้กระจายตัวดีกว่า hash แบบเดิม (ลดโอกาสหมวดที่ชื่อคล้ายกันได้สีใกล้เคียงกัน)
+  let hash = 2166136261;
+  for (let i=0;i<name.length;i++){
+    hash ^= name.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  hash = (hash ^ (hash >>> 15)) >>> 0;
+  return 'cat-' + (hash % CATEGORY_COLOR_COUNT);
+}
+
+function renderList(){
+  const q = els('search-input').value.trim().toLowerCase();
+  let list = items;
+  if (activeType) list = list.filter(i => (i.type||'credential') === activeType);
+  if (activeCategory) list = list.filter(i => i.category === activeCategory);
+  if (q) list = list.filter(i =>
+    (i.platform||'').toLowerCase().includes(q) ||
+    (i.username||'').toLowerCase().includes(q) ||
+    (i.note||'').toLowerCase().includes(q)
+  );
+  // รายการปักหมุดขึ้นก่อนเสมอ (คงลำดับเดิมภายในกลุ่มเดียวกัน)
+  list = [...list].sort((a,b) => (b.pinned?1:0) - (a.pinned?1:0));
+
+  const container = els('item-list');
+  container.innerHTML = '';
+  els('empty-state').classList.toggle('hidden', items.length !== 0);
+  if (items.length === 0) return;
+
+  // มีรายการอยู่ในระบบ แต่ filter/ค้นหาแล้วไม่เจอ — โชว์ empty state แบบเฉพาะจุด ไม่ใช่ลิสต์ว่างเปล่า
+  if (list.length === 0){
+    container.innerHTML = `
+      <div class="filtered-empty">
+        <div class="big-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="32" height="32" style="margin:0 auto">
+            <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+          </svg>
+        </div>
+        <div>${q ? `ไม่พบรายการที่ตรงกับ "${escapeHtml(q)}"` : 'ไม่มีรายการในหมวดนี้'}</div>
+      </div>`;
+    return;
+  }
+
+  list.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'item-row' + (item.pinned ? ' is-pinned' : '');
+    row.tabIndex = 0;
+    row.setAttribute('role','button');
+    const isFile = item.type === 'file';
+    row.innerHTML = `
+      <div class="item-icon ${isFile?'file-type':''}">${iconSvg(iconForItem(item), 18)}</div>
+      <div class="item-main">
+        <div class="platform">${escapeHtml(item.platform || '(ไม่มีชื่อ)')}</div>
+        <div class="username">${escapeHtml(isFile ? (item.note ? item.note : 'ไฟล์แนบ') : (item.username || ''))}</div>
+      </div>
+      ${item.category ? `<div class="item-tag ${categoryColorClass(item.category)}">${categoryTagIcon(item.category)}${escapeHtml(item.category)}</div>` : ''}
+      ${(!isFile && item.password) ? `<button class="pin-btn" title="คัดลอกรหัสผ่านด่วน" data-copy-id="${item.id}">${iconSvg('key',15)}</button>` : ''}
+      <button class="pin-btn ${item.pinned?'pinned':''}" title="${item.pinned?'เลิกปักหมุด':'ปักหมุดไว้บนสุด'}" data-pin-id="${item.id}">${iconSvg('pin',16)}</button>
+    `;
+    row.onclick = (e) => { if (e.target.closest('.pin-btn')) return; openDetail(item.id); };
+    row.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openDetail(item.id); } };
+    row.querySelector('.pin-btn[data-pin-id]').onclick = (e) => { e.stopPropagation(); togglePin(item.id); };
+    row.querySelector('.pin-btn[data-copy-id]')?.addEventListener('click', (e) => { e.stopPropagation(); copyText(item.password || ''); });
+    container.appendChild(row);
+  });
+}
+
+window.togglePin = async (id, fromDetail) => {
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+  const payload = { type: item.type, platform: item.platform, username: item.username, password: item.password, category: item.category, note: item.note, pinned: !item.pinned };
+  try{
+    const { iv, data } = await encryptText(vaultKey, JSON.stringify(payload));
+    const { error } = await sb.from('vault_items').update({ encrypted_data: data, iv }).eq('id', id);
+    if (error) throw error;
+    item.pinned = !item.pinned;
+    renderList();
+    if (fromDetail) openDetail(id);
+  } catch(e){ showToast('ปักหมุดไม่สำเร็จ: ' + e.message); }
+};
+els('search-input')?.addEventListener('input', renderList);
+
+/* =====================================================================
+   9) Modal: detail view
+===================================================================== */
+function openModal(html){
+  els('modal-body').innerHTML = html;
+  els('modal-backdrop').classList.remove('hidden');
+}
+function closeModal(){
+  els('modal-backdrop').classList.add('hidden');
+  editingItemId = null; pendingFiles = []; existingFormFiles = [];
+}
+els('modal-backdrop')?.addEventListener('click', (e)=>{ if (e.target.id === 'modal-backdrop') closeModal(); });
+window.closeModal = closeModal;
+
+async function openDetail(id){
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+  const { data: files } = await sb.from('vault_files').select('*').eq('vault_item_id', id);
+  const isFile = item.type === 'file';
+
+  openModal(`
+    <div class="modal-head"><h2>${escapeHtml(item.platform || '')}</h2>
+      <button class="icon-btn" onclick="closeModal()">${iconSvg('close',16)}</button></div>
+    <div class="meta-row">
+      <span>${iconWrap('clock',13)} เพิ่ม: ${fmtDate(item.created_at)}</span>
+      ${item.updated_at && item.updated_at !== item.created_at ? `<span>${iconWrap('pencil',13)} แก้ไขล่าสุด: ${fmtDate(item.updated_at)}</span>` : ''}
+    </div>
+    ${!isFile ? `
+    <div class="detail-field"><div class="k">USERNAME</div>
+      <div class="copy-row"><div class="v" id="dv-user">${escapeHtml(item.username||'-')}</div>
+        <button class="mini-btn" onclick="copyText('${escapeAttr(item.username||'')}')">คัดลอก</button></div></div>
+    <div class="detail-field"><div class="k">PASSWORD</div>
+      <div class="copy-row">
+        <div class="v" id="dv-pass">••••••••••</div>
+        <button class="mini-btn" id="btn-reveal">แสดง</button>
+        <button class="mini-btn" onclick="copyText('${escapeAttr(item.password||'')}')">คัดลอก</button>
+      </div></div>` : ''}
+    ${item.note ? `<div class="detail-field"><div class="k">NOTE</div><div class="v" style="font-family:var(--font-sans)">${escapeHtml(item.note)}</div></div>` : ''}
+    ${item.category ? `<div class="detail-field"><div class="k">หมวดหมู่</div><div class="v" style="font-family:var(--font-sans)"><span class="item-tag ${categoryColorClass(item.category)}">${categoryTagIcon(item.category)}${escapeHtml(item.category)}</span></div></div>` : ''}
+    <div id="detail-files"></div>
+    <div class="row-actions">
+      <button class="btn-ghost" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px" onclick="togglePin('${id}', true)">${iconWrap('pin',15)} ${item.pinned ? 'เลิกปักหมุด' : 'ปักหมุด'}</button>
+      <button class="btn-ghost" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px" onclick="openEditForm('${id}')">${iconWrap('pencil',15)} แก้ไข</button>
+      <button class="btn-danger" style="flex:1" onclick="confirmDelete('${id}')">${iconWrap('trash',15)} ลบ</button>
+    </div>
+  `);
+
+  if (!isFile){
+    els('btn-reveal').onclick = () => {
+      const el = els('dv-pass');
+      const showing = el.textContent !== '••••••••••';
+      el.textContent = showing ? '••••••••••' : (item.password || '-');
+      els('btn-reveal').textContent = showing ? 'แสดง' : 'ซ่อน';
+    };
+  }
+
+  if (files && files.length){
+    const box = els('detail-files');
+    box.innerHTML = '<div class="k" style="margin:14px 0 6px">ไฟล์แนบ</div>';
+    for (const f of files){
+      let name = 'ไฟล์แนบ', mime = '';
+      try{
+        const raw = await decryptText(vaultKey, f.name_iv, f.encrypted_name);
+        const parsed = JSON.parse(raw);
+        name = parsed.name; mime = parsed.mime || '';
+      } catch(e){
+        try{ name = await decryptText(vaultKey, f.name_iv, f.encrypted_name); } catch(e2){}
+      }
+      const rowEl = document.createElement('div');
+      rowEl.className = 'file-attach';
+      rowEl.innerHTML = `<div class="existing"><span>${iconWrap(mime.startsWith('image/')?'image':mime.startsWith('audio/')?'music':mime.startsWith('video/')?'video':'doc',16)} ${escapeHtml(name)}</span>
+        <button class="mini-btn" data-fid="${f.id}">${isPreviewableMime(mime, name) ? 'ดูตัวอย่าง' : 'เปิดไฟล์'}</button></div>
+        <div class="preview-box hidden" id="preview-${f.id}"></div>`;
+      rowEl.querySelector('button').onclick = () => previewOrDownloadFile(f, name, mime, rowEl.querySelector('#preview-'+f.id));
+      box.appendChild(rowEl);
+    }
+  }
+}
+
+const CLIPBOARD_CLEAR_MS = 25000; // ล้าง clipboard อัตโนมัติ 25 วินาทีหลังคัดลอก กันเผลอ paste ที่อื่น
+window.copyText = async (t) => {
+  try{
+    await navigator.clipboard.writeText(t);
+    showToast('คัดลอกแล้ว (ล้างอัตโนมัติใน 25 วิ)');
+    const myToken = ++clipboardClearToken;
+    setTimeout(async () => {
+      if (myToken !== clipboardClearToken) return; // มีการคัดลอกใหม่ทับไปแล้ว ไม่ต้องล้าง
+      try{
+        const current = await navigator.clipboard.readText();
+        if (current === t) await navigator.clipboard.writeText('');
+      } catch(e){ /* บาง browser ไม่อนุญาตให้อ่าน clipboard — ข้ามไปเงียบๆ */ }
+    }, CLIPBOARD_CLEAR_MS);
+  } catch(e){ showToast('คัดลอกไม่สำเร็จ'); }
+};
+
+function isPreviewableMime(mime, name){
+  if (!mime) mime = '';
+  if (mime.startsWith('image/') || mime.startsWith('audio/') || mime.startsWith('video/') || mime.startsWith('text/')) return true;
+  return /\.(txt|md|csv|json|log|ini|yaml|yml)$/i.test(name || '');
+}
+
+async function previewOrDownloadFile(fileRow, name, mime, previewEl){
+  showToast('กำลังถอดรหัสไฟล์...');
+  const { data, error } = await sb.storage.from(STORAGE_BUCKET).download(fileRow.storage_path);
+  if (error){ showToast('เปิดไฟล์ไม่สำเร็จ: ' + error.message); return; }
+  const buf = await data.arrayBuffer();
+  const plainBuf = await decryptBuffer(vaultKey, fileRow.file_iv, buf);
+  const blob = new Blob([plainBuf], { type: mime || 'application/octet-stream' });
+  const url = URL.createObjectURL(blob);
+
+  if (mime.startsWith('image/')){
+    previewEl.innerHTML = `<img src="${url}" alt="">`;
+    previewEl.classList.remove('hidden');
+  } else if (mime.startsWith('audio/')){
+    previewEl.innerHTML = `<audio controls src="${url}"></audio>`;
+    previewEl.classList.remove('hidden');
+  } else if (mime.startsWith('video/')){
+    previewEl.innerHTML = `<video controls src="${url}"></video>`;
+    previewEl.classList.remove('hidden');
+  } else if (isPreviewableMime(mime, name)){
+    let text = '';
+    try{ text = new TextDecoder('utf-8').decode(plainBuf); } catch(e){ text = '(อ่านเป็นข้อความไม่ได้)'; }
+    const truncated = text.length > 5000;
+    previewEl.innerHTML = `<pre class="text-preview">${escapeHtml(truncated ? text.slice(0,5000) : text)}${truncated ? '\n\n… (แสดงแค่บางส่วน ดาวน์โหลดเพื่อดูฉบับเต็ม)' : ''}</pre>`;
+    previewEl.classList.remove('hidden');
+  } else {
+    const a = document.createElement('a');
+    a.href = url; a.download = name; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  }
+}
+
+/* =====================================================================
+   10) Add / edit form
+===================================================================== */
+els('btn-add')?.addEventListener('click', () => openEditForm(null));
+
+window.openEditForm = (id, prefillFile) => {
+  editingItemId = id;
+  pendingFiles = []; existingFormFiles = [];
+  const item = id ? items.find(i => i.id === id) : { platform:'', username:'', password:'', note:'', category:'', type:'credential' };
+  formType = item.type || 'credential';
+  const catNames = allCategoryNames();
+
+  openModal(`
+    <div class="modal-head"><h2>${id ? 'แก้ไขรายการ' : 'เพิ่มรายการใหม่'}</h2>
+      <button class="icon-btn" onclick="closeModal()">${iconSvg('close',16)}</button></div>
+
+    <label>ประเภท</label>
+    <div class="type-toggle">
+      <button type="button" class="type-btn" id="type-credential">${iconWrap('key',15)} พาสเวิด</button>
+      <button type="button" class="type-btn" id="type-file">${iconWrap('clip',15)} ไฟล์แนบ</button>
+    </div>
+
+    <label id="lbl-platform">Platform / เว็บไซต์</label>
+    <input type="text" id="f-platform" value="${escapeAttr(item.platform)}" list="platform-datalist" autocomplete="off">
+    <datalist id="platform-datalist"></datalist>
+    <div class="chip-row" id="platform-preset-chips" style="margin-top:8px"></div>
+    <div class="preset-add-row">
+      <input type="text" id="new-preset-input" placeholder="เพิ่ม platform ที่ใช้บ่อยไว้เลือกเร็วๆ เช่น Valorant">
+      <button type="button" class="mini-btn" id="btn-add-preset">${iconWrap('plus',14)}</button>
+    </div>
+
+    <div id="credential-fields">
+      <label>Username / อีเมล</label>
+      <input type="text" id="f-username" value="${escapeAttr(item.username)}">
+      <label>Password</label>
+      <div class="field-with-btn">
+        <input type="text" id="f-password" value="${escapeAttr(item.password)}">
+        <button class="mini-btn" id="btn-genpass">สุ่ม</button>
+      </div>
+      <div class="pw-strength" id="pw-strength-wrap">
+        <div class="pw-strength-bar" id="pw-strength-bar">
+          <i></i><i></i><i></i><i></i>
+        </div>
+        <div class="pw-strength-label" id="pw-strength-label"></div>
+      </div>
+    </div>
+
+    <label>หมวดหมู่</label>
+    <select id="f-category">
+      <option value="">— ไม่มีหมวดหมู่ —</option>
+      ${catNames.map(c=>`<option value="${escapeAttr(c)}" ${item.category===c?'selected':''}>${escapeHtml(c)}</option>`).join('')}
+      <option value="__new__">+ สร้างหมวดหมู่ใหม่...</option>
+    </select>
+    <label>Note</label>
+    <textarea id="f-note">${escapeHtml(item.note||'')}</textarea>
+
+    <label>ไฟล์แนบ (รูป/เพลง/วิดีโอ/เอกสาร — แนบได้หลายไฟล์)</label>
+    <div class="file-attach" id="dropzone">
+      <div id="existing-file-info"></div>
+      <input type="file" id="f-file" multiple>
+      <div class="file-preview hidden" id="new-file-preview"></div>
+      <div class="hint">ลากไฟล์มาวางในกรอบนี้ได้เลย (เลือก/ลากได้ทีละหลายไฟล์)</div>
+    </div>
+
+    <div class="row-actions">
+      <button class="btn-primary" id="btn-save-item" style="flex:2">บันทึก</button>
+      <button class="btn-ghost" style="flex:1" onclick="closeModal()">ยกเลิก</button>
+    </div>
+    <p class="error-msg" id="form-error"></p>
+  `);
+
+  els('f-category').onchange = async (e) => {
+    if (e.target.value !== '__new__') return;
+    const name = (prompt('ชื่อหมวดหมู่ใหม่') || '').trim();
+    if (!name){ e.target.value = item.category || ''; return; }
+    try{
+      let existing = categories.find(c => c.name.toLowerCase() === name.toLowerCase());
+      if (!existing){
+        const pack = await encryptText(vaultKey, name);
+        const { data, error } = await sb.from('vault_categories')
+          .insert({ user_id: currentUser.id, encrypted_name: pack.data, name_iv: pack.iv }).select().single();
+        if (error) throw error;
+        existing = { id: data.id, name, icon_key: '' };
+        categories.push(existing);
+        categories.sort((a,b)=> a.name.localeCompare(b.name, 'th'));
+      }
+      const opt = document.createElement('option');
+      opt.value = existing.name; opt.textContent = existing.name;
+      e.target.insertBefore(opt, e.target.lastElementChild);
+      e.target.value = existing.name;
+      showToast('เพิ่มหมวดหมู่แล้ว');
+    } catch(err){
+      showToast('สร้างหมวดหมู่ไม่สำเร็จ: ' + err.message);
+      e.target.value = item.category || '';
+    }
+  };
+
+  function setFormType(t){
+    formType = t;
+    els('type-credential').classList.toggle('active', t==='credential');
+    els('type-file').classList.toggle('active', t==='file');
+    els('credential-fields').classList.toggle('hidden', t==='file');
+    els('lbl-platform').textContent = t==='file' ? 'ชื่อรายการ' : 'Platform / เว็บไซต์';
+  }
+  setFormType(formType);
+  els('type-credential').onclick = () => setFormType('credential');
+  els('type-file').onclick = () => setFormType('file');
+
+  renderPlatformPresetChips();
+  els('btn-add-preset').onclick = () => {
+    const input = els('new-preset-input');
+    const name = input.value.trim();
+    if (!name) return;
+    const list = loadPlatformPresets();
+    if (list.some(x => x.toLowerCase() === name.toLowerCase())){ showToast('มีอยู่แล้วในรายการโปรด'); return; }
+    list.push(name);
+    savePlatformPresets(list);
+    input.value = '';
+    renderPlatformPresetChips();
+    showToast('เพิ่มเข้ารายการโปรดแล้ว');
+  };
+  els('new-preset-input').onkeydown = (e) => { if (e.key === 'Enter'){ e.preventDefault(); els('btn-add-preset').click(); } };
+
+  els('btn-genpass').onclick = () => { els('f-password').value = generatePassword(); renderPwStrength(els('f-password').value); };
+  els('f-password')?.addEventListener('input', (e) => renderPwStrength(e.target.value));
+  renderPwStrength(els('f-password')?.value || '');
+
+  const fileInput = els('f-file');
+  fileInput.onchange = (e) => { addPendingFiles([...e.target.files]); e.target.value = ''; };
+
+  const dropzone = els('dropzone');
+  ['dragenter','dragover'].forEach(evt => dropzone.addEventListener(evt, (e)=>{
+    e.preventDefault(); e.stopPropagation(); dropzone.classList.add('drag-over');
+  }));
+  ['dragleave','drop'].forEach(evt => dropzone.addEventListener(evt, (e)=>{
+    e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('drag-over');
+  }));
+  dropzone.addEventListener('drop', (e)=>{
+    const fs = [...(e.dataTransfer.files || [])];
+    if (fs.length){
+      addPendingFiles(fs);
+      if (!els('f-platform').value.trim()){
+        els('f-platform').value = fs[0].name.replace(/\.[^.]+$/, '');
+      }
+      setFormType('file');
+    }
+  });
+
+  if (id) loadExistingFileInfo(id);
+  els('btn-save-item').onclick = () => saveItem(id);
+};
+
+function addPendingFiles(files){
+  if (!files || !files.length) return;
+  pendingFiles = pendingFiles.concat(files);
+  renderPendingFilePreview();
+}
+function removePendingFile(idx){
+  pendingFiles.splice(idx, 1);
+  renderPendingFilePreview();
+}
+function renderPendingFilePreview(){
+  const box = els('new-file-preview');
+  if (!box) return;
+  if (!pendingFiles.length){ box.classList.add('hidden'); box.innerHTML=''; return; }
+  box.classList.remove('hidden');
+  box.innerHTML = '';
+  pendingFiles.forEach((file, idx) => {
+    const row = document.createElement('div');
+    row.className = 'file-attach';
+    row.style.marginTop = '8px';
+    const url = URL.createObjectURL(file);
+    let mediaHtml = '';
+    if (file.type.startsWith('image/')) mediaHtml = `<img src="${url}" alt="">`;
+    else if (file.type.startsWith('audio/')) mediaHtml = `<audio controls src="${url}"></audio>`;
+    else if (file.type.startsWith('video/')) mediaHtml = `<video controls src="${url}"></video>`;
+    row.innerHTML = `<div class="existing"><span>${iconWrap('clip',15)} ${escapeHtml(file.name)} (ไฟล์ใหม่)</span>
+      <button class="mini-btn" data-remove="${idx}">${iconWrap('trash',14)} เอาออก</button></div>
+      ${mediaHtml ? `<div class="preview-box">${mediaHtml}</div>` : ''}`;
+    row.querySelector('[data-remove]').onclick = () => removePendingFile(idx);
+    box.appendChild(row);
+  });
+}
+
+async function loadExistingFileInfo(itemId){
+  const { data: files } = await sb.from('vault_files').select('*').eq('vault_item_id', itemId);
+  existingFormFiles = files || [];
+  const box = els('existing-file-info');
+  if (!existingFormFiles.length){ box.innerHTML = ''; return; }
+  box.innerHTML = '';
+  for (const f of existingFormFiles){
+    let name = 'ไฟล์แนบเดิม', mime = '';
+    try{
+      const raw = await decryptText(vaultKey, f.name_iv, f.encrypted_name);
+      try{ const parsed = JSON.parse(raw); name = parsed.name; mime = parsed.mime || ''; } catch(e){ name = raw; }
+    } catch(e){}
+    const rowEl = document.createElement('div');
+    rowEl.className = 'file-attach';
+    rowEl.style.marginBottom = '8px';
+    rowEl.innerHTML = `<div class="existing"><span>${iconWrap('clip',15)} ${escapeHtml(name)} (มีอยู่แล้ว)</span>
+      <div style="display:flex; gap:6px; flex-shrink:0">
+        <button class="mini-btn" data-act="preview">${isPreviewableMime(mime, name) ? 'ดูตัวอย่าง' : 'เปิดไฟล์'}</button>
+        <button class="mini-btn" data-act="remove">${iconWrap('trash',14)} ลบ</button>
+      </div></div>
+      <div class="preview-box hidden" data-preview></div>`;
+    rowEl.querySelector('[data-act="preview"]').onclick = () => previewOrDownloadFile(f, name, mime, rowEl.querySelector('[data-preview]'));
+    rowEl.querySelector('[data-act="remove"]').onclick = async () => {
+      if (!confirm('ลบไฟล์แนบนี้?')) return;
+      await sb.storage.from(STORAGE_BUCKET).remove([f.storage_path]);
+      await sb.from('vault_files').delete().eq('id', f.id);
+      existingFormFiles = existingFormFiles.filter(x => x.id !== f.id);
+      rowEl.remove();
+      showToast('ลบไฟล์แนบแล้ว');
+    };
+    box.appendChild(rowEl);
+  }
+}
+
+/* ---------- platform ที่ใช้บ่อย (preset เร็ว ไม่ต้องพิมพ์ทุกครั้ง) ---------- */
+const DEFAULT_PLATFORM_PRESETS = [
+  'Gmail','Facebook','Instagram','Line','Discord','Telegram','TikTok','X (Twitter)',
+  'Github','Netflix','Spotify','Valorant','Steam','PlayStation Network','League of Legends',
+  'Shopee','Lazada','ธนาคารกสิกรไทย','ธนาคารไทยพาณิชย์','ธนาคารกรุงไทย','พร้อมเพย์',
+];
+function platformPresetsKey(){ return 'vaultledger_platform_presets_' + (currentUser ? currentUser.id : ''); }
+function loadPlatformPresets(){
+  try{
+    const raw = localStorage.getItem(platformPresetsKey());
+    if (raw) return JSON.parse(raw);
+  } catch(e){}
+  return [...DEFAULT_PLATFORM_PRESETS];
+}
+function savePlatformPresets(list){
+  try{ localStorage.setItem(platformPresetsKey(), JSON.stringify(list)); } catch(e){}
+}
+function renderPlatformPresetChips(){
+  const wrap = els('platform-preset-chips');
+  if (!wrap) return;
+  const presets = loadPlatformPresets();
+  const dl = els('platform-datalist');
+  if (dl) dl.innerHTML = presets.map(p => `<option value="${escapeAttr(p)}"></option>`).join('');
+  if (!presets.length){ wrap.innerHTML = '<span class="hint">ยังไม่มี platform โปรด — เพิ่มด้านล่างได้เลย</span>'; return; }
+  wrap.innerHTML = presets.map(p => `
+    <button type="button" class="chip preset-chip" data-p="${escapeAttr(p)}">
+      <span>${escapeHtml(p)}</span><span class="preset-x" data-remove="${escapeAttr(p)}">${iconSvg('close',11)}</span>
+    </button>`).join('');
+  wrap.querySelectorAll('.preset-chip').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const xBtn = e.target.closest('.preset-x');
+      if (xBtn){
+        e.stopPropagation();
+        const updated = loadPlatformPresets().filter(x => x !== xBtn.dataset.remove);
+        savePlatformPresets(updated);
+        renderPlatformPresetChips();
+        return;
+      }
+      els('f-platform').value = btn.dataset.p;
+      els('f-platform').focus();
+    });
+  });
+}
+
+function generatePassword(len=18){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%^&*';
+  const arr = randomBytes(len);
+  return Array.from(arr, b => chars[b % chars.length]).join('');
+}
+
+/* ---------- ตัวเช็คความแข็งแรงของรหัสผ่าน ---------- */
+function pwStrength(pw){
+  if (!pw) return { score:0, level:'', label:'' };
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (pw.length >= 12) score++;
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  if (pw.length < 6) score = Math.min(score, 1);
+  score = Math.min(score, 4);
+  const levels = ['weak','weak','fair','good','strong'];
+  const labels = { weak:'อ่อน — ลองยาวขึ้นหรือผสมสัญลักษณ์', fair:'กลาง', good:'ค่อนข้างแข็งแรง', strong:'แข็งแรง' };
+  const level = levels[score];
+  return { score, level, label: labels[level] };
+}
+function renderPwStrength(pw){
+  const bar = els('pw-strength-bar');
+  const label = els('pw-strength-label');
+  if (!bar || !label) return;
+  const { score, level, label:text } = pwStrength(pw);
+  bar.querySelectorAll('i').forEach((b, i) => { b.className = (i < score) ? ('on ' + level) : ''; });
+  label.textContent = pw ? text : '';
+  label.className = 'pw-strength-label' + (pw ? (' ' + level) : '');
+}
+
+async function saveItem(id){
+  const existing = id ? items.find(i => i.id === id) : null;
+  const payload = {
+    type: formType,
+    platform: els('f-platform').value.trim(),
+    username: formType==='file' ? '' : els('f-username').value.trim(),
+    password: formType==='file' ? '' : els('f-password').value,
+    category: els('f-category').value.trim(),
+    note: els('f-note').value.trim(),
+    pinned: existing ? !!existing.pinned : false,
+  };
+  if (!payload.platform){ els('form-error').textContent = formType==='file' ? 'ตั้งชื่อรายการด้วย' : 'กรอกชื่อ platform ด้วย'; return; }
+  if (formType === 'file' && !pendingFiles.length && !existingFormFiles.length && !id){ els('form-error').textContent = 'เลือกไฟล์ที่จะแนบด้วย'; return; }
+
+  els('btn-save-item').disabled = true;
+  try{
+    const { iv, data } = await encryptText(vaultKey, JSON.stringify(payload));
+    let itemId = id;
+    if (id){
+      const { error } = await sb.from('vault_items').update({ encrypted_data: data, iv }).eq('id', id);
+      if (error) throw error;
+    } else {
+      const { data: inserted, error } = await sb.from('vault_items')
+        .insert({ user_id: currentUser.id, encrypted_data: data, iv }).select().single();
+      if (error) throw error;
+      itemId = inserted.id;
+    }
+    for (const f of pendingFiles) await uploadAttachedFile(itemId, f);
+    closeModal();
+    await loadItems();
+    await hydrateFileMimeCache();
+    showToast('บันทึกแล้ว');
+  } catch(e){
+    els('form-error').textContent = 'บันทึกไม่สำเร็จ: ' + e.message;
+  } finally {
+    const b = els('btn-save-item'); if (b) b.disabled = false;
+  }
+}
+
+async function uploadAttachedFile(itemId, file){
+  const buf = await file.arrayBuffer();
+  const { iv: fileIv, data: cipherBuf } = await encryptBuffer(vaultKey, buf);
+  const namePack = await encryptText(vaultKey, JSON.stringify({ name: file.name, mime: file.type || '' }));
+  const path = `${currentUser.id}/${itemId}/${crypto.randomUUID()}.bin`;
+  const { error: upErr } = await sb.storage.from(STORAGE_BUCKET).upload(path, new Blob([cipherBuf]), { upsert:true });
+  if (upErr) throw upErr;
+  const { error: dbErr } = await sb.from('vault_files').insert({
+    user_id: currentUser.id, vault_item_id: itemId, storage_path: path,
+    encrypted_name: namePack.data, name_iv: namePack.iv, file_iv: fileIv,
+    size_bytes: cipherBuf.byteLength
+  });
+  if (dbErr) throw dbErr;
+}
+
+window.confirmDelete = async (id) => {
+  if (!confirm('ลบรายการนี้ถาวร?')) return;
+  const { data: files } = await sb.from('vault_files').select('*').eq('vault_item_id', id);
+  if (files && files.length){
+    await sb.storage.from(STORAGE_BUCKET).remove(files.map(f => f.storage_path));
+  }
+  const { error } = await sb.from('vault_items').delete().eq('id', id);
+  if (error){ showToast('ลบไม่สำเร็จ: ' + error.message); return; }
+  closeModal();
+  await loadItems();
+  showToast('ลบแล้ว');
+};
+
+/* =====================================================================
+   11) Global drag & drop (ลากไฟล์มาวางที่หน้าหลักเพื่อเพิ่มรายการใหม่)
+===================================================================== */
+const appEl = els('screen-app');
+let overlayEl = null;
+function ensureOverlay(){
+  if (overlayEl) return overlayEl;
+  overlayEl = document.createElement('div');
+  overlayEl.className = 'drop-overlay hidden';
+  overlayEl.innerHTML = `<div class="msg">${iconWrap('clip',28)}<br>ปล่อยไฟล์เพื่อเพิ่มรายการใหม่</div>`;
+  document.body.appendChild(overlayEl);
+  return overlayEl;
+}
+document.addEventListener('dragenter', (e)=>{
+  if (appEl.classList.contains('hidden')) return;
+  if (!e.dataTransfer || !e.dataTransfer.types || !e.dataTransfer.types.includes('Files')) return;
+  e.preventDefault();
+  dragCounter++;
+  ensureOverlay().classList.remove('hidden');
+});
+document.addEventListener('dragover', (e)=>{
+  if (appEl.classList.contains('hidden')) return;
+  if (!e.dataTransfer || !e.dataTransfer.types || !e.dataTransfer.types.includes('Files')) return;
+  e.preventDefault();
+});
+document.addEventListener('dragleave', (e)=>{
+  if (appEl.classList.contains('hidden')) return;
+  dragCounter = Math.max(0, dragCounter - 1);
+  if (dragCounter === 0 && overlayEl) overlayEl.classList.add('hidden');
+});
+document.addEventListener('drop', (e)=>{
+  if (appEl.classList.contains('hidden')) return;
+  if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files.length) return;
+  e.preventDefault();
+  dragCounter = 0;
+  if (overlayEl) overlayEl.classList.add('hidden');
+  if (!els('modal-backdrop').classList.contains('hidden')) return; // มี modal เปิดอยู่แล้ว ปล่อยให้ dropzone ในนั้นจัดการเอง
+  const dropped = [...e.dataTransfer.files];
+  openEditForm(null);
+  setTimeout(()=>{
+    addPendingFiles(dropped);
+    if (!els('f-platform').value.trim()) els('f-platform').value = dropped[0].name.replace(/\.[^.]+$/, '');
+    els('type-file').click();
+  }, 30);
+});
+
+/* =====================================================================
+   12) หมวดหมู่: จัดการ (สร้าง/แก้ไข/ลบ) + พื้นที่จัดเก็บ
+===================================================================== */
+/* ไอคอนให้เลือกต่อหมวดหมู่ — ช่วยแยกหมวดที่หน้าตาคล้ายกัน (เช่นมีหลายเกม) ให้ดูออกไวๆ ด้วยตา */
+const CATEGORY_ICON_CHOICES = [
+  'folder','key','controller','crosshair','shield','disc','mail','chat','code',
+  'bank','cart','cloud','video','music','image','doc','globe','star','card','camera',
+];
+let openIconPickerCatId = null;
+
+function renderCategoryManageList(){
+  const wrap = els('cat-manage-list');
+  if (!wrap) return;
+  if (!categories.length){
+    wrap.innerHTML = '<p class="hint">ยังไม่มีหมวดหมู่ — เพิ่มหมวดแรกด้านล่าง</p>';
+    return;
+  }
+  wrap.innerHTML = categories.map(c => {
+    const count = items.filter(i => i.category === c.name).length;
+    const pickerHtml = openIconPickerCatId === c.id ? `
+      <div class="icon-picker" data-picker-for="${c.id}">
+        ${CATEGORY_ICON_CHOICES.map(k => `
+          <button type="button" class="icon-pick-opt ${(c.icon_key||'')===k?'active':''}" data-icon="${k}" title="${k}">${iconSvg(k,16)}</button>
+        `).join('')}
+      </div>` : '';
+    return `
+    <div class="cat-manage-row" data-id="${c.id}">
+      <div class="name-wrap">
+        <button type="button" class="cat-icon-btn" data-act="pick-icon" title="ตั้งไอคอนหมวดหมู่นี้">${iconSvg(c.icon_key || 'folder', 15)}</button>
+        <span class="name">${escapeHtml(c.name)}${count ? ` <span class="count-badge">(${count})</span>` : ''}</span>
+      </div>
+      <div class="cat-manage-actions">
+        <button class="mini-btn" data-act="rename">${iconWrap('pencil',14)}</button>
+        <button class="mini-btn" data-act="delete">${iconWrap('trash',14)}</button>
+      </div>
+      ${pickerHtml}
+    </div>`;
+  }).join('');
+  wrap.querySelectorAll('.cat-manage-row').forEach(row => {
+    const id = row.dataset.id;
+    row.querySelector('[data-act="rename"]').onclick = () => renameCategory(id);
+    row.querySelector('[data-act="delete"]').onclick = () => deleteCategory(id);
+    row.querySelector('[data-act="pick-icon"]').onclick = () => {
+      openIconPickerCatId = (openIconPickerCatId === id) ? null : id;
+      renderCategoryManageList();
+    };
+    row.querySelectorAll('.icon-pick-opt').forEach(btn => {
+      btn.onclick = () => setCategoryIcon(id, btn.dataset.icon);
+    });
+  });
+}
+
+async function setCategoryIcon(id, iconKey){
+  const cat = categories.find(c => c.id === id);
+  if (!cat) return;
+  const prev = cat.icon_key;
+  cat.icon_key = iconKey; // อัปเดตหน้าจอทันทีให้รู้สึกไว ค่อยยืนยันกับ server
+  openIconPickerCatId = null;
+  renderCategoryManageList();
+  renderList();
+  try{
+    const { error } = await sb.from('vault_categories').update({ icon_key: iconKey }).eq('id', id);
+    if (error) throw error;
+  } catch(e){
+    cat.icon_key = prev; // เปลี่ยนไม่สำเร็จ คืนค่าเดิม
+    renderCategoryManageList();
+    renderList();
+    showToast('ตั้งไอคอนไม่สำเร็จ: ' + e.message);
+  }
+}
+
+window.openCategoryManager = () => {
+  openModal(`
+    <div class="modal-head"><h2>จัดการหมวดหมู่</h2>
+      <button class="icon-btn" onclick="closeModal()">${iconSvg('close',16)}</button></div>
+    <p class="hint">หมวดหมู่ที่สร้างไว้ตรงนี้จะเลือกได้ทันทีตอนเพิ่มรายการใหม่ ไม่ต้องพิมพ์ซ้ำทุกครั้ง</p>
+    <div id="cat-manage-list" style="margin-top:10px"></div>
+    <div class="cat-add-row">
+      <input type="text" id="new-cat-name" placeholder="ชื่อหมวดหมู่ใหม่ เช่น Gmail">
+      <button class="btn-ghost" id="btn-add-category">${iconWrap('plus',14)} เพิ่ม</button>
+    </div>
+    <p class="error-msg" id="cat-error"></p>
+  `);
+  renderCategoryManageList();
+  const submit = async () => {
+    const input = els('new-cat-name');
+    const name = input.value.trim();
+    els('cat-error').textContent = '';
+    if (!name){ els('cat-error').textContent = 'ใส่ชื่อหมวดหมู่ด้วย'; return; }
+    if (categories.some(c => c.name.toLowerCase() === name.toLowerCase())){
+      els('cat-error').textContent = 'มีหมวดหมู่นี้อยู่แล้ว'; return;
+    }
+    try{
+      const pack = await encryptText(vaultKey, name);
+      const { data, error } = await sb.from('vault_categories')
+        .insert({ user_id: currentUser.id, encrypted_name: pack.data, name_iv: pack.iv }).select().single();
+      if (error) throw error;
+      categories.push({ id: data.id, name, icon_key: '' });
+      categories.sort((a,b)=> a.name.localeCompare(b.name, 'th'));
+      input.value = '';
+      renderCategoryManageList();
+      renderCategories();
+      showToast('เพิ่มหมวดหมู่แล้ว');
+    } catch(e){ els('cat-error').textContent = 'เพิ่มไม่สำเร็จ: ' + e.message; }
+  };
+  els('btn-add-category').onclick = submit;
+  els('new-cat-name').onkeydown = (e) => { if (e.key === 'Enter'){ e.preventDefault(); submit(); } };
+};
+
+async function renameCategory(id){
+  const cat = categories.find(c => c.id === id);
+  if (!cat) return;
+  const newName = (prompt('ชื่อหมวดหมู่ใหม่', cat.name) || '').trim();
+  if (!newName || newName === cat.name) return;
+  if (categories.some(c => c.id !== id && c.name.toLowerCase() === newName.toLowerCase())){
+    showToast('มีหมวดหมู่ชื่อนี้อยู่แล้ว'); return;
+  }
+  try{
+    const pack = await encryptText(vaultKey, newName);
+    const { error } = await sb.from('vault_categories').update({ encrypted_name: pack.data, name_iv: pack.iv }).eq('id', id);
+    if (error) throw error;
+    // รายการเดิมอ้างอิงหมวดหมู่ด้วยชื่อ (ไม่ใช่ id) — ต้องอัปเดตให้ตรงกับชื่อใหม่ด้วย
+    const affected = items.filter(i => i.category === cat.name);
+    for (const it of affected){
+      const payload = { type: it.type, platform: it.platform, username: it.username, password: it.password, category: newName, note: it.note, pinned: !!it.pinned };
+      const { iv, data } = await encryptText(vaultKey, JSON.stringify(payload));
+      await sb.from('vault_items').update({ encrypted_data: data, iv }).eq('id', it.id);
+    }
+    const oldName = cat.name;
+    cat.name = newName;
+    if (activeCategory === oldName) activeCategory = newName;
+    await loadItems();
+    renderCategoryManageList();
+    showToast('แก้ไขหมวดหมู่แล้ว');
+  } catch(e){ showToast('แก้ไขไม่สำเร็จ: ' + e.message); }
+}
+
+async function deleteCategory(id){
+  const cat = categories.find(c => c.id === id);
+  if (!cat) return;
+  const affectedCount = items.filter(i => i.category === cat.name).length;
+  const msg = affectedCount
+    ? `ลบหมวดหมู่ "${cat.name}"? รายการ ${affectedCount} รายการในหมวดนี้จะไม่ถูกลบ แค่กลายเป็น "ไม่มีหมวดหมู่"`
+    : `ลบหมวดหมู่ "${cat.name}"?`;
+  if (!confirm(msg)) return;
+  try{
+    const { error } = await sb.from('vault_categories').delete().eq('id', id);
+    if (error) throw error;
+    const affected = items.filter(i => i.category === cat.name);
+    for (const it of affected){
+      const payload = { type: it.type, platform: it.platform, username: it.username, password: it.password, category: '', note: it.note, pinned: !!it.pinned };
+      const { iv, data } = await encryptText(vaultKey, JSON.stringify(payload));
+      await sb.from('vault_items').update({ encrypted_data: data, iv }).eq('id', it.id);
+    }
+    categories = categories.filter(c => c.id !== id);
+    if (activeCategory === cat.name) activeCategory = null;
+    await loadItems();
+    renderCategoryManageList();
+    showToast('ลบหมวดหมู่แล้ว');
+  } catch(e){ showToast('ลบไม่สำเร็จ: ' + e.message); }
+}
+
+els('btn-manage-categories')?.addEventListener('click', openCategoryManager);
+
+function fmtBytes(n){
+  if (!n) return '0 B';
+  if (n < 1024) return n + ' B';
+  if (n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
+  if (n < 1024*1024*1024) return (n/1024/1024).toFixed(1) + ' MB';
+  return (n/1024/1024/1024).toFixed(2) + ' GB';
+}
+
+els('btn-storage-usage')?.addEventListener('click', async () => {
+  openModal(`
+    <div class="modal-head"><h2>พื้นที่จัดเก็บ</h2>
+      <button class="icon-btn" onclick="closeModal()">${iconSvg('close',16)}</button></div>
+    <p class="hint">กำลังคำนวณ...</p>
+  `);
+  const { data, error } = await sb.from('vault_files').select('size_bytes').eq('user_id', currentUser.id);
+  if (error){
+    els('modal-body').innerHTML = `
+      <div class="modal-head"><h2>พื้นที่จัดเก็บ</h2>
+        <button class="icon-btn" onclick="closeModal()">${iconSvg('close',16)}</button></div>
+      <p class="error-msg">โหลดข้อมูลไม่สำเร็จ: ${escapeHtml(error.message)}</p>`;
+    return;
+  }
+  const rows = data || [];
+  const totalBytes = rows.reduce((s,f) => s + (f.size_bytes || 0), 0);
+  const fileCount = rows.length;
+  const credCount = items.filter(i => (i.type||'credential') !== 'file').length;
+  els('modal-body').innerHTML = `
+    <div class="modal-head"><h2>พื้นที่จัดเก็บ</h2>
+      <button class="icon-btn" onclick="closeModal()">${iconSvg('close',16)}</button></div>
+    <div class="detail-field"><div class="k">ไฟล์แนบทั้งหมด</div>
+      <div class="v" style="font-family:var(--font-sans)">${fileCount} ไฟล์ — ใช้พื้นที่รวม ${fmtBytes(totalBytes)}</div></div>
+    <div class="detail-field"><div class="k">รายการพาสเวิด</div>
+      <div class="v" style="font-family:var(--font-sans)">${credCount} รายการ</div></div>
+    <div class="detail-field"><div class="k">หมวดหมู่ทั้งหมด</div>
+      <div class="v" style="font-family:var(--font-sans)">${categories.length} หมวดหมู่</div></div>
+    <p class="hint">ตัวเลขนี้คำนวณจากขนาดข้อมูลที่เข้ารหัสแล้วซึ่งเก็บจริงใน Supabase Storage (bucket "${STORAGE_BUCKET}")
+      แผนฟรีมาตรฐานของ Supabase ให้พื้นที่ 1GB ต่อโปรเจกต์ — เช็คโควตาที่แท้จริงได้ที่ Supabase Dashboard → Project Settings → Usage</p>
+  `;
+});
+
+/* =====================================================================
+   13) Lock / sign out
+===================================================================== */
+els('btn-lock')?.addEventListener('click', () => {
+  clearTimeout(lockTimer);
+  vaultKey = null; items = [];
+  showMasterScreen();
+});
+els('btn-signout')?.addEventListener('click', async () => {
+  clearTimeout(lockTimer);
+  vaultKey = null; items = [];
+  await sb.auth.signOut();
+});
+
+/* =====================================================================
+   14) Export / Import (encrypted backup file)
+===================================================================== */
+function bufToB64Chunked(buf){
+  // แปลง ArrayBuffer เป็น base64 แบบไม่ล้น call stack สำหรับไฟล์ขนาดใหญ่
+  const bytes = new Uint8Array(buf);
+  let bin = '';
+  const chunk = 0x8000;
+  for (let i=0; i<bytes.length; i+=chunk){
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
+  }
+  return btoa(bin);
+}
+
+els('btn-export')?.addEventListener('click', async () => {
+  showToast('กำลังเตรียมไฟล์สำรอง (รวมไฟล์แนบ)...', 4000);
+  const { data: rows, error } = await sb.from('vault_items').select('id, encrypted_data, iv, created_at').eq('user_id', currentUser.id);
+  if (error){ showToast('ส่งออกไม่สำเร็จ: ' + error.message); return; }
+
+  const { data: fileRows, error: fErr } = await sb.from('vault_files').select('*').eq('user_id', currentUser.id);
+  if (fErr){ showToast('ส่งออกไม่สำเร็จ (ไฟล์แนบ): ' + fErr.message); return; }
+
+  const files = [];
+  for (const f of (fileRows || [])){
+    try{
+      const { data: blob, error: dlErr } = await sb.storage.from(STORAGE_BUCKET).download(f.storage_path);
+      if (dlErr) throw dlErr;
+      const buf = await blob.arrayBuffer();
+      files.push({
+        vault_item_id: f.vault_item_id,
+        encrypted_name: f.encrypted_name, name_iv: f.name_iv, file_iv: f.file_iv,
+        size_bytes: f.size_bytes,
+        data_b64: bufToB64Chunked(buf),
+      });
+    } catch(e){ /* ถ้าไฟล์ไหนดาวน์โหลดไม่ได้ ข้ามไป ไม่ให้ล้มทั้งก้อน */ }
+  }
+
+  const backup = { version: 2, exported_at: new Date().toISOString(), settings: vaultSettings, items: rows, files };
+  const blob = new Blob([JSON.stringify(backup)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `vault-backup-${Date.now()}.json`; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  markBackupDone();
+  showToast(`ดาวน์โหลดไฟล์สำรองแล้ว (เข้ารหัสอยู่ รวมไฟล์แนบ ${files.length} ไฟล์)`, 4000);
+});
+
+els('btn-import')?.addEventListener('click', () => els('import-file-input').click());
+els('import-file-input')?.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  e.target.value = '';
+  let backup;
+  try{ backup = JSON.parse(await file.text()); } catch(e){ showToast('ไฟล์ไม่ถูกต้อง'); return; }
+  if (!backup.settings || !backup.items){ showToast('รูปแบบไฟล์สำรองไม่ถูกต้อง'); return; }
+
+  const pw = prompt('ใส่ master password ที่ใช้ตอนสร้างไฟล์สำรองนี้ (ปกติคือรหัสหลักเดิมของคุณ)');
+  if (!pw) return;
+  try{
+    const importKey = await deriveKey(pw, backup.settings.salt);
+    const check = await decryptText(importKey, backup.settings.verifier_iv, backup.settings.verifier);
+    if (check !== 'VAULT_OK') throw new Error('รหัสไม่ตรงกับไฟล์สำรองนี้');
+
+    showToast('กำลังนำเข้าข้อมูล...', 4000);
+    let count = 0;
+    const idMap = {}; // id เดิมในไฟล์สำรอง -> id ใหม่ที่สร้างในระบบ (สำหรับ map ไฟล์แนบ)
+    for (const row of backup.items){
+      const json = await decryptText(importKey, row.iv, row.encrypted_data);
+      const repacked = await encryptText(vaultKey, json);
+      const { data: inserted, error } = await sb.from('vault_items')
+        .insert({ user_id: currentUser.id, encrypted_data: repacked.data, iv: repacked.iv }).select().single();
+      if (!error){ count++; idMap[row.id] = inserted.id; }
+    }
+
+    let fileCount = 0;
+    if (Array.isArray(backup.files) && backup.files.length){
+      for (const f of backup.files){
+        const newItemId = idMap[f.vault_item_id];
+        if (!newItemId) continue;
+        try{
+          // ถอดรหัสชื่อ+เนื้อไฟล์ด้วยรหัสเดิม (importKey) แล้วเข้ารหัสใหม่ด้วยรหัสวอลต์ปัจจุบัน (vaultKey)
+          const nameJson = await decryptText(importKey, f.name_iv, f.encrypted_name);
+          const plainBuf = await decryptBuffer(importKey, f.file_iv, b64ToBuf(f.data_b64));
+          const namePack = await encryptText(vaultKey, nameJson);
+          const { iv: newFileIv, data: newCipherBuf } = await encryptBuffer(vaultKey, plainBuf);
+          const path = `${currentUser.id}/${newItemId}/${crypto.randomUUID()}.bin`;
+          const { error: upErr } = await sb.storage.from(STORAGE_BUCKET).upload(path, new Blob([newCipherBuf]), { upsert:true });
+          if (upErr) throw upErr;
+          const { error: dbErr } = await sb.from('vault_files').insert({
+            user_id: currentUser.id, vault_item_id: newItemId, storage_path: path,
+            encrypted_name: namePack.data, name_iv: namePack.iv, file_iv: newFileIv,
+            size_bytes: newCipherBuf.byteLength
+          });
+          if (dbErr) throw dbErr;
+          fileCount++;
+        } catch(e){ /* ไฟล์แนบไหนนำเข้าไม่สำเร็จ ข้ามไป ไม่ให้ล้มทั้งก้อน */ }
+      }
+    }
+
+    await loadItems();
+    await hydrateFileMimeCache();
+    showToast(`นำเข้าสำเร็จ ${count} รายการ${fileCount ? ` + ไฟล์แนบ ${fileCount} ไฟล์` : ''}`, 4000);
+  } catch(err){
+    showToast('นำเข้าไม่สำเร็จ: ' + err.message);
+  }
+});
+
+/* =====================================================================
+   15) เปลี่ยนรหัสหลัก (Reset Master Password)
+   — ต้องถอดรหัสข้อมูลทุกอย่างด้วยรหัสเดิมแล้วเข้ารหัสใหม่ทั้งหมด (รายการ, หมวดหมู่, ไฟล์แนบ)
+     เพราะไฟล์แนบเข้ารหัสด้วยกุญแจที่มาจาก master password โดยตรง ไม่ใช่กุญแจกลาง
+===================================================================== */
+els('btn-change-master')?.addEventListener('click', () => {
+  openModal(`
+    <div class="modal-head"><h2>เปลี่ยนรหัสหลัก</h2>
+      <button class="icon-btn" onclick="closeModal()">${iconSvg('close',16)}</button></div>
+    <p class="hint">ระบบจะถอดรหัสข้อมูลทั้งหมด (รายการ, หมวดหมู่, ไฟล์แนบ) ด้วยรหัสเดิม แล้วเข้ารหัสใหม่ทั้งหมดด้วยรหัสใหม่
+      ถ้ามีไฟล์แนบเยอะหรือไฟล์ใหญ่อาจใช้เวลาสักครู่ — อย่าปิดแท็บระหว่างดำเนินการ</p>
+    <label for="cmp-current">รหัสหลักปัจจุบัน</label>
+    <input type="password" id="cmp-current" autocomplete="current-password">
+    <label for="cmp-new">รหัสหลักใหม่</label>
+    <input type="password" id="cmp-new" autocomplete="new-password">
+    <label for="cmp-confirm">ยืนยันรหัสหลักใหม่</label>
+    <input type="password" id="cmp-confirm" autocomplete="new-password">
+    <button class="btn-primary" id="btn-cmp-submit">เปลี่ยนรหัสหลัก</button>
+    <p class="error-msg" id="cmp-error"></p>
+    <p class="status-msg" id="cmp-status"></p>
+  `);
+  els('btn-cmp-submit').onclick = submitChangeMasterPassword;
+});
+
+async function submitChangeMasterPassword(){
+  const curPw = els('cmp-current').value;
+  const newPw = els('cmp-new').value;
+  const confirmPw = els('cmp-confirm').value;
+  els('cmp-error').textContent = '';
+  if (!curPw || !newPw){ els('cmp-error').textContent = 'กรอกรหัสให้ครบ'; return; }
+  if (newPw.length < 6){ els('cmp-error').textContent = 'รหัสใหม่ควรยาวอย่างน้อย 6 ตัว'; return; }
+  if (newPw !== confirmPw){ els('cmp-error').textContent = 'รหัสใหม่ยืนยันไม่ตรงกัน'; return; }
+  if (newPw === curPw){ els('cmp-error').textContent = 'รหัสใหม่ต้องไม่เหมือนรหัสเดิม'; return; }
+
+  const btn = els('btn-cmp-submit');
+  const statusEl = els('cmp-status');
+  const setStatus = (msg) => { statusEl.className = 'status-msg ok'; statusEl.textContent = msg; };
+  btn.disabled = true;
+
+  try{
+    // 1) ตรวจรหัสเดิมให้ถูกต้องก่อน
+    const oldKey = await deriveKey(curPw, vaultSettings.salt);
+    const check = await decryptText(oldKey, vaultSettings.verifier_iv, vaultSettings.verifier);
+    if (check !== 'VAULT_OK') throw new Error('รหัสหลักปัจจุบันไม่ถูกต้อง');
+
+    // 2) เตรียมกุญแจใหม่
+    setStatus('กำลังเตรียมรหัสใหม่...');
+    const newSalt = bufToB64(randomBytes(16));
+    const newKey = await deriveKey(newPw, newSalt);
+
+    // 3) เข้ารหัสรายการ (vault_items) ใหม่ทั้งหมด
+    const { data: itemRows, error: itemErr } = await sb.from('vault_items').select('id, encrypted_data, iv').eq('user_id', currentUser.id);
+    if (itemErr) throw itemErr;
+    for (let i=0; i<itemRows.length; i++){
+      setStatus(`กำลังเข้ารหัสรายการใหม่... (${i+1}/${itemRows.length})`);
+      const row = itemRows[i];
+      const json = await decryptText(oldKey, row.iv, row.encrypted_data);
+      const repacked = await encryptText(newKey, json);
+      const { error } = await sb.from('vault_items').update({ encrypted_data: repacked.data, iv: repacked.iv }).eq('id', row.id);
+      if (error) throw error;
+    }
+
+    // 4) เข้ารหัสชื่อหมวดหมู่ใหม่ทั้งหมด
+    const { data: catRows, error: catErr } = await sb.from('vault_categories').select('id, encrypted_name, name_iv').eq('user_id', currentUser.id);
+    if (catErr) throw catErr;
+    for (let i=0; i<catRows.length; i++){
+      setStatus(`กำลังเข้ารหัสหมวดหมู่ใหม่... (${i+1}/${catRows.length})`);
+      const row = catRows[i];
+      const name = await decryptText(oldKey, row.name_iv, row.encrypted_name);
+      const pack = await encryptText(newKey, name);
+      const { error } = await sb.from('vault_categories').update({ encrypted_name: pack.data, name_iv: pack.iv }).eq('id', row.id);
+      if (error) throw error;
+    }
+
+    // 5) ถอด+เข้ารหัสไฟล์แนบใหม่ทั้งหมด (ชื่อไฟล์ + เนื้อไฟล์จริงใน Storage)
+    const { data: fileRows, error: fileErr } = await sb.from('vault_files').select('*').eq('user_id', currentUser.id);
+    if (fileErr) throw fileErr;
+    for (let i=0; i<fileRows.length; i++){
+      setStatus(`กำลังเข้ารหัสไฟล์แนบใหม่... (${i+1}/${fileRows.length})`);
+      const f = fileRows[i];
+      const nameJson = await decryptText(oldKey, f.name_iv, f.encrypted_name);
+      const namePack = await encryptText(newKey, nameJson);
+      const { data: blob, error: dlErr } = await sb.storage.from(STORAGE_BUCKET).download(f.storage_path);
+      if (dlErr) throw dlErr;
+      const cipherBuf = await blob.arrayBuffer();
+      const plainBuf = await decryptBuffer(oldKey, f.file_iv, cipherBuf);
+      const { iv: newFileIv, data: newCipherBuf } = await encryptBuffer(newKey, plainBuf);
+      const { error: upErr } = await sb.storage.from(STORAGE_BUCKET).upload(f.storage_path, new Blob([newCipherBuf]), { upsert:true });
+      if (upErr) throw upErr;
+      const { error: dbErr } = await sb.from('vault_files').update({
+        encrypted_name: namePack.data, name_iv: namePack.iv, file_iv: newFileIv, size_bytes: newCipherBuf.byteLength
+      }).eq('id', f.id);
+      if (dbErr) throw dbErr;
+    }
+
+    // 6) อัปเดต verifier ของวอลต์เป็นรหัสใหม่ (ทำเป็นขั้นตอนสุดท้าย เผื่อขั้นก่อนหน้าล้มเหลวจะได้ยังใช้รหัสเดิมเข้าได้อยู่)
+    setStatus('กำลังปิดงาน...');
+    const verifierPack = await encryptText(newKey, 'VAULT_OK');
+    const { error: settingsErr } = await sb.from('vault_settings').update({
+      salt: newSalt, verifier: verifierPack.data, verifier_iv: verifierPack.iv
+    }).eq('user_id', currentUser.id);
+    if (settingsErr) throw settingsErr;
+
+    vaultSettings = { ...vaultSettings, salt: newSalt, verifier: verifierPack.data, verifier_iv: verifierPack.iv };
+    vaultKey = newKey;
+    resetLockTimer();
+    closeModal();
+    showToast('เปลี่ยนรหัสหลักสำเร็จแล้ว', 4000);
+  } catch(e){
+    els('cmp-error').textContent = 'เปลี่ยนรหัสไม่สำเร็จ: ' + e.message + ' — รหัสเดิมยังใช้งานได้อยู่ ลองใหม่อีกครั้ง';
+    statusEl.textContent = '';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* =====================================================================
+   16) PWA — ลงทะเบียน service worker (แคชเปลือกแอปให้เปิดเร็วขึ้น/ใช้เป็นแอปได้)
+===================================================================== */
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(()=>{ /* ไม่มี sw.js หรือลงทะเบียนไม่สำเร็จ ข้ามไปเงียบๆ */ });
+  });
+}
+
+/* =====================================================================
+   17) Boot
+===================================================================== */
+boot();
+</script>
+</body>
+</html>
