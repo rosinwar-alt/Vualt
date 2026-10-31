@@ -201,6 +201,23 @@ input[type=range]{width:100%;accent-color:var(--accent);height:30px}
 .foot{text-align:center;color:var(--muted);font-size:12px;margin-top:30px}
 @media(max-width:640px){.top-in .brand span,.search kbd{display:none}.sync span{display:none}.sync{padding:0 10px}.frow .lab{width:84px}.grid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}}
+#splash{position:fixed;inset:0;z-index:99;display:grid;place-content:center;justify-items:center;gap:14px;background:var(--bg);transition:opacity .6s,visibility .6s}
+#splash.gone{opacity:0;visibility:hidden}
+#splash svg{width:92px;animation:sp 1.2s var(--spring) both,fl 2s 1.2s ease-in-out infinite}
+#splash b{font-size:24px;letter-spacing:.2em;animation:sf .8s .3s both}
+.sbar{width:140px;height:4px;border-radius:9px;background:var(--surface2);overflow:hidden}.sbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));animation:sl 1.5s ease-out forwards}
+@keyframes sp{from{transform:scale(.3) rotate(-25deg);opacity:0}}@keyframes sf{from{opacity:0;transform:translateY(10px)}}@keyframes sl{to{width:100%}}@keyframes fl{50%{transform:translateY(-6px)}}
+.imgs{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 14px}.imgc{position:relative;width:calc(50% - 5px)}.imgc img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px;display:block}
+.imgc .icon-btn{position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,.6);color:#fff;width:40px;height:40px;overflow:visible}
+.imgc .rm{top:6px;bottom:auto}
+.bs{position:absolute;left:50%;top:50%;font-size:14px;pointer-events:none;animation:bs .9s ease-out forwards}
+@keyframes bs{to{transform:translate(var(--x),var(--y)) rotate(200deg) scale(.4);opacity:0}}
+.dbbox{margin:4px 0 12px;border:1px solid var(--line);border-radius:14px;padding:2px 14px;background:var(--surface2)}
+.dbbox summary{cursor:pointer;min-height:44px;display:flex;align-items:center;gap:6px;font-weight:600;font-size:14px;list-style:none}
+.dbbox summary::-webkit-details-marker{display:none}.dbbox summary small{color:var(--muted);font-weight:500}
+.dbbox .hint{color:var(--muted);font-size:12.5px;margin:0 0 12px}
+.pin{letter-spacing:.12em;font-size:18px}
+@media(max-width:640px){.inp,textarea,select{font-size:16px!important}.lock-card{padding:22px 18px}.stats{gap:8px}.main{padding-left:14px;padding-right:14px}.grid{grid-template-columns:1fr!important}}
 </style>
 </head>
 <body>
@@ -233,6 +250,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:30px}
 </defs></svg>
 
 <!-- LOCK SCREEN -->
+<div id="splash"><svg viewBox="0 0 96 96"><rect x="6" y="6" width="84" height="84" rx="26" fill="url(#lg)"/><path d="M36 46V38a12 12 0 0 1 24 0v8" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/><rect x="28" y="46" width="40" height="28" rx="9" fill="#fff"/></svg><b>Vault</b><div class="sbar"><i></i></div></div>
 <section id="lock">
   <div class="lock-card" id="lockCard">
     <svg class="logo" viewBox="0 0 96 96" aria-hidden="true">
@@ -244,25 +262,19 @@ input[type=range]{width:100%;accent-color:var(--accent);height:30px}
     </svg>
     <h1 id="lockTitle">Vault</h1>
     <p class="sub" id="lockSub"></p>
-    <div class="tabs hidden" id="lockTabs">
-      <button data-m="new">สร้างใหม่</button><button data-m="file">จากไฟล์</button><button data-m="cloud">จากคลาวด์</button>
-    </div>
+    <div class="tabs hidden" id="lockTabs"><button data-m="new">เริ่มใช้งาน</button><button data-m="file">จากไฟล์สำรอง</button></div>
     <form id="lockForm" autocomplete="off">
-      <div id="cloudBox" class="hidden">
-        <label class="field"><span>Supabase URL</span><input class="inp" id="cfgUrl" placeholder="https://xxxx.supabase.co" inputmode="url"></label>
-        <label class="field"><span>Anon / Publishable key</span><input class="inp" id="cfgKey" placeholder="eyJ... หรือ sb_publishable_..."></label>
-      </div>
-      <div id="fileBox" class="hidden">
-        <label class="field"><span>ไฟล์สำรอง (.vault หรือไฟล์ .json แบบเก่า)</span><input class="inp" type="file" id="lockFile" accept=".vault,.json,application/json"></label>
-      </div>
-      <label class="field"><span id="pwLabel">รหัสหลัก</span>
-        <div class="inp-wrap"><input class="inp" id="pw" type="password" autocomplete="current-password" autofocus><button type="button" class="icon-btn" id="pwEye" aria-label="แสดงรหัส"><svg class="i"><use href="#i-eye"/></svg></button></div>
+      <div id="fileBox" class="hidden"><label class="field"><span>ไฟล์สำรอง (.vault)</span><input class="inp" type="file" id="lockFile" accept=".vault,.json,application/json"></label></div>
+      <label class="field"><span id="pwLabel">PIN</span>
+        <div class="inp-wrap"><input class="inp pin" id="pw" type="password" placeholder="ตัวเลขหรือตัวอักษร 4 ตัวขึ้นไป" autocomplete="current-password" autofocus><button type="button" class="icon-btn" id="pwEye" aria-label="แสดง PIN"><svg class="i"><use href="#i-eye"/></svg></button></div>
       </label>
-      <div id="newBox" class="hidden">
-        <div class="meter"><b id="mBar"></b></div><div class="meter-t" id="mTxt"></div>
-        <label class="field"><span>ยืนยันรหัสหลัก</span><input class="inp" id="pw2" type="password" autocomplete="new-password"></label>
-        <label class="check"><input type="checkbox" id="ack"><span>เข้าใจว่า <b>ถ้าลืมรหัสหลักจะกู้ข้อมูลไม่ได้เลย</b> และจะเก็บไฟล์สำรองไว้</span></label>
-      </div>
+      <div id="meterBox" class="hidden"><div class="meter"><b id="mBar"></b></div><div class="meter-t" id="mTxt"></div></div>
+      <div id="newBox" class="hidden"><label class="field"><span>พิมพ์ PIN อีกครั้งเพื่อสร้างวอลต์ใหม่</span><input class="inp pin" id="pw2" type="password" autocomplete="new-password"></label></div>
+      <details id="dbBox" class="dbbox"><summary>🗄️ ฐานข้อมูล Supabase <small>(ไม่บังคับ — ไว้ใช้หลายเครื่อง)</small></summary>
+        <label class="field"><span>Supabase URL</span><input class="inp" id="cfgUrl" placeholder="https://xxxx.supabase.co" inputmode="url" autocomplete="off"></label>
+        <label class="field"><span>Publishable / anon key</span><input class="inp" id="cfgKey" placeholder="sb_publishable_… หรือ eyJ…" autocomplete="off"></label>
+        <p class="hint">ถ้ามีข้อมูลเดิมในฐานข้อมูล แค่ใส่ PIN เดิมก็ดึงมาให้เอง ถ้าข้ามไว้ ข้อมูลจะอยู่ในเครื่องนี้เท่านั้น</p>
+      </details>
       <p class="err" id="lockErr"></p>
       <button class="btn primary block" id="lockBtn" type="submit">ปลดล็อก</button>
     </form>
@@ -275,7 +287,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:30px}
   <header class="top"><div class="top-in">
     <div class="brand"><svg viewBox="0 0 96 96"><rect x="6" y="6" width="84" height="84" rx="26" fill="url(#lg)"/><path d="M36 46V38a12 12 0 0 1 24 0v8" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><rect x="28" y="46" width="40" height="28" rx="9" fill="#fff"/></svg><span>Vault</span></div>
     <div class="search"><svg class="i"><use href="#i-search"/></svg><input class="inp" id="q" placeholder="ค้นหา…" autocomplete="off" enterkeyhint="search"><kbd>/</kbd></div>
-    <button class="sync" id="syncChip" title="ซิงค์"><i class="dot"></i><span id="syncTxt">ออฟไลน์</span></button>
+    <button class="sync" id="syncChip" title="ฐานข้อมูล"><i class="dot"></i><span id="syncTxt">ในเครื่อง</span></button>
     <button class="icon-btn" id="btnTheme" aria-label="ธีม"><svg class="i"><use href="#i-sun"/></svg></button>
     <button class="icon-btn" id="btnSet" aria-label="ตั้งค่า"><svg class="i"><use href="#i-gear"/></svg></button>
     <button class="icon-btn" id="btnLock" aria-label="ล็อก"><svg class="i"><use href="#i-lock"/></svg></button>
@@ -286,7 +298,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:30px}
     <div class="groups" id="groups"></div>
     <div class="grid" id="grid"></div>
     <div class="empty hidden" id="empty"><span class="big">🗝️</span><b>ยังไม่มีรายการ</b><p>กดปุ่ม ＋ มุมขวาล่างเพื่อเพิ่มรายการแรก<br>หรือวางหลายบัญชีพร้อมกันได้ที่ ตั้งค่า → นำเข้า</p></div>
-    <p class="foot">เข้ารหัสในเครื่องคุณ · ไม่มีใครอ่านข้อมูลได้นอกจากรหัสหลักของคุณ</p>
+    <p class="foot">เข้ารหัสในเครื่องคุณ · ไม่มีใครอ่านข้อมูลได้นอกจากPINของคุณ</p>
   </main>
   <button class="fab" id="fab" aria-label="เพิ่มรายการ"><svg class="i"><use href="#i-plus"/></svg></button>
 </div>
@@ -298,12 +310,8 @@ input[type=range]{width:100%;accent-color:var(--accent);height:30px}
 
 <script>
 'use strict';
-/* =====================================================================
-   ตั้งค่า Supabase (ไม่บังคับ) — ใส่ค่าตรงนี้ไว้ จะได้ไม่ต้องกรอกใหม่หลังล้างเครื่อง
-   anon/publishable key เป็นคีย์สาธารณะ ใส่ในโค้ดได้ (ข้อมูลที่ขึ้นไปเข้ารหัสแล้วเสมอ)
-===================================================================== */
-const DEFAULT_SUPABASE_URL = '';
-const DEFAULT_SUPABASE_KEY = '';
+const DEFAULT_SUPABASE_URL = '';  // ใส่ URL ของ Supabase ตรงนี้ได้ จะได้ไม่ต้องกรอกบนมือถือ
+const DEFAULT_SUPABASE_KEY = '';  // publishable/anon key (คีย์สาธารณะ ใส่ได้)
 
 /* ============================ helpers ============================ */
 const $ = s => document.querySelector(s);
@@ -440,7 +448,7 @@ async function remotePut(file){
     body: JSON.stringify({ id: S.syncId, data: file, updated_at: new Date().toISOString() }) });
   if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + (await r.text()).slice(0,140));
 }
-function schedulePush(){ clearTimeout(S.pushT); if (!syncOn()) { setSync('', 'เฉพาะเครื่องนี้'); return; } setSync('busy','รอซิงค์…'); S.pushT = setTimeout(() => sync(true), 1200); }
+function schedulePush(){ clearTimeout(S.pushT); if (!syncOn()) { setSync('', 'ในเครื่อง'); return; } setSync('busy','รอซิงค์…'); S.pushT = setTimeout(() => sync(true), 1200); }
 let syncing = false;
 async function sync(quiet){
   if (!syncOn() || !S.keys || syncing) return; syncing = true;
@@ -465,6 +473,9 @@ async function sync(quiet){
   } finally { syncing = false; }
 }
 window.addEventListener('online', () => { if (S.dirty) sync(true); });
+
+function ensureSyncId_(){}
+async function ensureSyncId(){ if (S.pwHold && cfg.url && cfg.key) S.syncId = await vaultId(S.pwHold); else S.syncId = null; }
 
 /* ============================ UI utils ============================ */
 function toast(msg, ms=2400){
@@ -561,7 +572,10 @@ function render(){
   const list = visible();
   $('#empty').querySelector('b').textContent = all.length ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีรายการ';
   $('#empty').classList.toggle('hidden', list.length > 0);
-  $('#grid').innerHTML = list.map((e,i) => {
+  const grp = new Map(); list.forEach(e => { const k = e.t.trim().toLowerCase(); if (!grp.has(k)) grp.set(k, []); grp.get(k).push(e); });
+  $('#grid').innerHTML = [...grp.entries()].map(([gk, items], i) => {
+    const e = items[0];
+    if (items.length > 1) return `<div class="card" role="button" tabindex="0" data-grp="${esc(gk)}" style="--i:${Math.min(i,14)}">${avatar(e)}<div class="meta"><b>${esc(e.t)}</b><span>${items.length} บัญชี · กดเพื่อดูทั้งหมด</span></div><div class="qa"><span class="chip on">${items.length}</span></div></div>`;
     const { user, pass } = primary(e);
     return `<div class="card" role="button" tabindex="0" data-id="${e.id}" style="--i:${Math.min(i,14)}">${e.fav?`<span class="star">⭐</span>`:''}${avatar(e)}
       <div class="meta"><b>${esc(e.t)}</b><span>${esc(user ? user.v : (KINDS[e.k]?.n || ''))}</span></div>
@@ -577,14 +591,25 @@ function healthCount(){
 }
 $('#filters').onclick = e => { const b = e.target.closest('[data-f]'); if (b){ S.filter = b.dataset.f; render(); } };
 $('#groups').onclick = e => { const b = e.target.closest('[data-g]'); if (b){ S.group = S.group === b.dataset.g ? '' : b.dataset.g; render(); } };
+function groupSheet(gk){
+  const items = S.vault.entries.filter(x => x.t.trim().toLowerCase() === gk); if (!items.length) return;
+  openSheet(items[0].t + ' (' + items.length + ')', items.map(x => { const u = primary(x).user; return `<div class="card" role="button" tabindex="0" data-id="${x.id}" style="margin-bottom:8px">${avatar(x)}<div class="meta"><b>${esc(u ? u.v : x.t)}</b><span>${x.g ? '#'+esc(x.g)+' · ' : ''}${(x.img||[]).length ? '🖼️ '+x.img.length+' รูป · ' : ''}${KINDS[x.k]?.n || ''}</span></div></div>`; }).join(''));
+  $('#sheetB').onclick = ev => { const b = ev.target.closest('[data-id]'); if (b) showDetail(b.dataset.id); };
+}
 $('#grid').onclick = e => {
+  const g = e.target.closest('[data-grp]'); if (g){ groupSheet(g.dataset.grp); return; }
   const c = e.target.closest('[data-copy]');
   if (c){ e.stopPropagation(); const [id, w] = c.dataset.copy.split(':'); const en = S.vault.entries.find(x => x.id === id); const p = primary(en); copy(w==='u' ? p.user.v : p.pass.v, w==='u' ? 'ชื่อผู้ใช้' : 'รหัสผ่าน'); return; }
   const card = e.target.closest('.card'); if (card) showDetail(card.dataset.id);
 };
-$('#grid').onkeydown = e => { if (e.key === 'Enter' && e.target.classList.contains('card')) showDetail(e.target.dataset.id); };
+$('#grid').onkeydown = e => { if (e.key === 'Enter' && e.target.classList.contains('card')){ if (e.target.dataset.grp) groupSheet(e.target.dataset.grp); else showDetail(e.target.dataset.id); } };
 $('#q').oninput = e => { S.q = e.target.value; render(); };
 
+
+const MAXIMG = 1280;
+async function shrinkImage(f){ const bm = await createImageBitmap(f), k = Math.min(1, MAXIMG/Math.max(bm.width,bm.height)); const c = document.createElement('canvas'); c.width = Math.round(bm.width*k); c.height = Math.round(bm.height*k); c.getContext('2d').drawImage(bm,0,0,c.width,c.height); return c.toDataURL('image/jpeg',.8); }
+function burst(btn){ for (let i=0;i<8;i++){ const a = i/8*6.283, n = document.createElement('span'); n.className='bs'; n.textContent='⭐'; n.style.setProperty('--x', Math.cos(a)*38+'px'); n.style.setProperty('--y', Math.sin(a)*38+'px'); btn.append(n); setTimeout(() => n.remove(), 950); } }
+function downloadImg(m){ const a = document.createElement('a'); a.href = m.d; a.download = (m.n || 'image').replace(/\.[^.]+$/,'') + '.jpg'; document.body.append(a); a.click(); a.remove(); }
 /* ============================ detail ============================ */
 function colorPw(v){ return [...v].map(c => /\d/.test(c) ? `<span class="pw-c-n">${esc(c)}</span>` : /[A-Za-z]/.test(c) ? esc(c) : `<span class="pw-c-s">${esc(c)}</span>`).join(''); }
 function showDetail(id){
@@ -592,14 +617,16 @@ function showDetail(id){
   const rows = e.f.filter(f => f.v).map((f,i) => `<div class="drow" style="--i:${i}"><div class="dv"><small>${esc(f.l)}</small><div class="v ${f.s?'mono':''}" data-v="${i}">${f.s ? '••••••••••' : esc(f.v)}</div></div>
     ${f.s?`<button class="icon-btn" data-eye="${i}" aria-label="แสดง/ซ่อน">${ico('eye')}</button>`:''}<button class="icon-btn" data-c="${i}" aria-label="คัดลอก">${ico('copy')}</button></div>`).join('');
   const shown = e.f.filter(f => f.v);
+  const imgs = (e.img||[]).length ? `<div class="imgs">${e.img.map((m,i) => `<div class="imgc"><img src="${m.d}" alt=""><button class="icon-btn" data-dl="${i}" aria-label="ดาวน์โหลดรูป">⬇️</button></div>`).join('')}</div>` : '';
   openSheet(KINDS[e.k]?.n || 'รายการ', `<div class="dhead">${avatar(e)}<div><h3>${esc(e.t)}</h3><p>${e.g?'#'+esc(e.g)+' · ':''}อัปเดต ${new Date(e.u).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'})}</p></div></div>
-    ${rows}${e.url?`<div class="drow"><div class="dv"><small>เว็บไซต์</small><div class="v">${esc(e.url)}</div></div><a class="icon-btn" target="_blank" rel="noopener noreferrer" href="https://${esc(e.url.replace(/^https?:\/\//,''))}" aria-label="เปิด">${ico('link')}</a></div>`:''}`,
+    ${rows}${imgs}${e.url?`<div class="drow"><div class="dv"><small>เว็บไซต์</small><div class="v">${esc(e.url)}</div></div><a class="icon-btn" target="_blank" rel="noopener noreferrer" href="https://${esc(e.url.replace(/^https?:\/\//,''))}" aria-label="เปิด">${ico('link')}</a></div>`:''}`,
     `<button class="btn ghost" id="dFav">${ico('star')} ${e.fav?'เลิกโปรด':'โปรด'}</button><button class="btn ghost" id="dEdit">${ico('edit')} แก้ไข</button><button class="btn danger" id="dDel">${ico('trash')}</button>`);
   const b = $('#sheetB');
   b.onclick = ev => {
     const eye = ev.target.closest('[data-eye]'), cp = ev.target.closest('[data-c]');
     if (eye){ const i = +eye.dataset.eye, el = b.querySelector(`[data-v="${i}"]`), on = el.dataset.on !== '1'; el.dataset.on = on?'1':''; el.innerHTML = on ? colorPw(shown[i].v) : '••••••••••'; eye.innerHTML = ico(on?'eyeoff':'eye'); }
     if (cp){ const f = shown[+cp.dataset.c]; copy(f.v, f.l); }
+    const dl = ev.target.closest('[data-dl]'); if (dl){ burst(dl); downloadImg(e.img[+dl.dataset.dl]); toast('ดาวน์โหลดรูปแล้ว'); }
   };
   $('#dFav').onclick = async () => { e.fav = e.fav ? 0 : 1; e.u = Date.now(); await persist(); render(); showDetail(id); };
   $('#dEdit').onclick = () => openEditor(e);
@@ -615,7 +642,8 @@ function showDetail(id){
 function openEditor(entry){
   const isNew = !entry;
   const E = entry ? JSON.parse(JSON.stringify(entry)) : { id: uid(), k:'login', t:'', g:'', url:'', f:[], fav:0, c:Date.now(), u:Date.now() };
-  let touched = !isNew;
+  let touched = !isNew; E.img = E.img || [];
+  const imgBlock = () => `<div class="field"><span>รูปภาพ (บีบอัดอัตโนมัติ)</span></div><div class="imgs">${E.img.map((m,i) => `<div class="imgc"><img src="${m.d}" alt=""><button type="button" class="icon-btn rm" data-ri="${i}" aria-label="ลบรูป">✕</button></div>`).join('')}</div><button type="button" class="chip" id="addImg" style="margin-bottom:16px">📷 เพิ่มรูป</button>`;
   const applyKind = k => {
     E.k = k;
     if (!touched){ E.f = KINDS[k].f.map(x => ({ l:x.l, v:'', s:x.s?1:0, m:x.m?1:0 })); const pw = E.f.find(x => x.s && KINDS[k].gen); if (pw) pw.v = genPassword(pref.glen); }
@@ -637,7 +665,8 @@ function openEditor(entry){
       ${pw ? `<div class="meter"><b id="eBar"></b></div><div class="meter-t" id="eTxt"></div>` : ''}
       <button type="button" class="chip" id="addF" style="margin-bottom:16px">${ico('plus')} เพิ่มช่อง</button>
       <label class="field"><span>หมวด (ไม่บังคับ — ไว้จัดกลุ่ม)</span><input class="inp" id="eG" value="${esc(E.g)}" placeholder="เช่น งาน, ครอบครัว, เกมมือถือ" autocomplete="off"></label>
-      <label class="field"><span>เว็บไซต์ (ไม่บังคับ)</span><input class="inp" id="eU" value="${esc(E.url)}" placeholder="example.com" inputmode="url" autocomplete="off"></label>`;
+      <label class="field"><span>เว็บไซต์ (ไม่บังคับ)</span><input class="inp" id="eU" value="${esc(E.url)}" placeholder="example.com" inputmode="url" autocomplete="off"></label>
+      ${imgBlock()}`;
     meter();
   };
   const meter = () => { const pw = E.f.find(x => x.s && !x.m); const bar = $('#eBar'); if (!bar || !pw) return; const s = strength(pw.v); bar.style.width = s.s + '%'; bar.style.background = sColor(s.s); $('#eTxt').textContent = pw.v ? `ความแข็งแรง: ${s.t}` : ''; };
@@ -658,6 +687,8 @@ function openEditor(entry){
     if (t.dataset.eye !== undefined){ const f = E.f[+t.dataset.eye]; f._show = !f._show; draw(); return; }
     if (t.dataset.gen !== undefined){ touched = true; E.f[+t.dataset.gen].v = genPassword(pref.glen); E.f[+t.dataset.gen]._show = true; draw(); return; }
     if (t.dataset.rm !== undefined){ touched = true; E.f.splice(+t.dataset.rm, 1); draw(); return; }
+    if (t.dataset.ri !== undefined){ E.img.splice(+t.dataset.ri,1); draw(); return; }
+    if (t.id === 'addImg'){ const inp = document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.multiple=true; inp.onchange = async () => { for (const f of inp.files){ try { E.img.push({ n:f.name, d:await shrinkImage(f) }); } catch { toast('อ่านรูปไม่ได้: '+f.name); } } draw(); }; inp.click(); return; }
     if (t.id === 'addF'){ touched = true; E.f.push({ l:'ช่องใหม่', v:'', s:0 }); draw(); const ins = B.querySelectorAll('[data-l]'); ins[ins.length-1]?.select(); }
   };
   B.onkeydown = ev => { if (ev.key === 'Enter' && ev.target.tagName === 'INPUT' && ev.target.id !== 'eG'){ ev.preventDefault(); save(); } };
@@ -734,14 +765,14 @@ async function importBackupFlow(){
   const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.vault,.json';
   inp.onchange = async () => {
     const f = inp.files[0]; if (!f) return; const text = await readFileText(f);
-    const pw = await dialog({ title:'รหัสหลักของไฟล์นี้', text:'ใส่รหัสหลักที่ใช้ตอนสร้างไฟล์สำรอง (ถ้าเหมือนกับตอนนี้ก็ใส่อันเดียวกัน)', input:'รหัสหลัก', type:'password', ok:'นำเข้า' });
+    const pw = await dialog({ title:'PINของไฟล์นี้', text:'ใส่PINที่ใช้ตอนสร้างไฟล์สำรอง (ถ้าเหมือนกับตอนนี้ก็ใส่อันเดียวกัน)', input:'PIN', type:'password', ok:'นำเข้า' });
     if (!pw) return;
     try{
       const r = await openAnyBackup(text, pw); let added = 0, extra = '';
       if (r.vault){ const before = S.vault.entries.length; S.vault = mergeVaults(S.vault, r.vault); added = S.vault.entries.length - before; }
       else { added = addParsed(r.legacy.entries.map(e => ({ t:e.t, user:e.f.find(x=>!x.s&&x.l!=='โน้ต')?.v||'', pass:e.f.find(x=>x.s)?.v||'', url:'', note:e.f.find(x=>x.l==='โน้ต')?.v||'' }))); if (r.legacy.skippedFiles) extra = ` (ข้ามไฟล์แนบ ${r.legacy.skippedFiles} รายการ)`; }
       await persist(); closeSheet(); render(); toast(`นำเข้าแล้ว ${added} รายการ${extra}`, 4500);
-    } catch(e){ toast(e.message === 'bad-password' ? 'รหัสหลักไม่ถูกต้อง' : e.message); }
+    } catch(e){ toast(e.message === 'bad-password' ? 'PINไม่ถูกต้อง' : e.message); }
   };
   inp.click();
 }
@@ -789,35 +820,43 @@ function settingsSheet(){
     <div class="set-sec"><h4>เครื่องมือ</h4><div class="set-row"><button class="btn ghost" id="sGen">${ico('dice')} สุ่มรหัสผ่าน</button><button class="btn ghost" id="sHealth">${ico('shield')} ตรวจสุขภาพรหัส</button></div></div>
     <div class="set-sec"><h4>สำรอง / ย้ายข้อมูล</h4><div class="set-row"><button class="btn primary" id="sExp">${ico('down')} ส่งออกไฟล์เข้ารหัส</button><button class="btn ghost" id="sImp">${ico('up')} นำเข้าไฟล์</button><button class="btn ghost" id="sBulk">${ico('list')} วางหลายบัญชี</button></div>
       <p style="color:var(--muted);font-size:12.5px;margin:8px 0 0">ไฟล์ .vault ใช้ได้กับ Vault CMD (VaultCMD/Vault.bat) · สำรองล่าสุด: ${last ? new Date(last).toLocaleDateString('th-TH') : 'ยังไม่เคย'}</p></div>
-    <div class="set-sec"><h4>ซิงค์คลาวด์ (Supabase)</h4>
-      <label class="field"><span>URL</span><input class="inp" id="sUrl" value="${esc(cfg.url)}" placeholder="https://xxxx.supabase.co"></label>
-      <label class="field"><span>Anon / Publishable key</span><input class="inp" id="sKey" value="${esc(cfg.key)}" placeholder="eyJ… หรือ sb_publishable_…"></label>
-      <div class="set-row"><button class="btn ghost" id="sSave">บันทึก & ซิงค์</button><button class="btn ghost" id="sOff">ปิดซิงค์</button></div></div>
+    <div class="set-sec"><h4>ฐานข้อมูล (Supabase)</h4><p style="color:var(--muted);font-size:13px;margin:0 0 10px">${cfg.url ? 'เชื่อมอยู่กับ ' + esc(cfg.url.replace(/^https?:\/\//,'')) : 'ยังไม่ได้เชื่อม — ข้อมูลอยู่ในเครื่องนี้เท่านั้น'}</p><div class="set-row"><button class="btn ghost" id="sDb">${ico('cloud')} ${cfg.url ? 'ย้าย / เปลี่ยนฐานข้อมูล' : 'เชื่อมฐานข้อมูล'}</button>${cfg.url ? '<button class="btn ghost" id="sDbOff">ตัดการเชื่อมต่อ</button>' : ''}</div></div>
     <div class="set-sec"><h4>ความปลอดภัย</h4>
       <label class="field"><span>ล็อกอัตโนมัติเมื่อไม่ได้ใช้งาน (นาที, 0 = ปิด)</span><input class="inp" id="sLock" type="number" min="0" max="120" value="${pref.lock}"></label>
       <label class="field"><span>ล้างคลิปบอร์ดหลังคัดลอก (วินาที, 0 = ไม่ล้าง)</span><input class="inp" id="sClip" type="number" min="0" max="300" value="${pref.clip}"></label>
-      <div class="set-row"><button class="btn ghost" id="sPw">เปลี่ยนรหัสหลัก</button><button class="btn danger" id="sWipe">ล้างข้อมูลในเครื่องนี้</button></div></div>`);
+      <div class="set-row"><button class="btn ghost" id="sPw">เปลี่ยนPIN</button><button class="btn danger" id="sWipe">ล้างข้อมูลในเครื่องนี้</button></div></div>`);
   const B = $('#sheetB');
   $('#sGen').onclick = generatorSheet; $('#sHealth').onclick = healthSheet; $('#sExp').onclick = exportFile; $('#sImp').onclick = importBackupFlow; $('#sBulk').onclick = bulkImportSheet;
   $('#sLock').onchange = e => { lsSet('vault.lockMin', String(Math.max(0, +e.target.value||0))); armLock(); toast('บันทึกแล้ว'); };
   $('#sClip').onchange = e => { lsSet('vault.clipSec', String(Math.max(0, +e.target.value||0))); toast('บันทึกแล้ว'); };
-  $('#sSave').onclick = async () => { lsSet('vault.url', $('#sUrl').value.trim()); lsSet('vault.key', $('#sKey').value.trim()); await ensureSyncId(); S.dirty = true; sync(false); };
-  $('#sOff').onclick = () => { lsSet('vault.url',''); lsSet('vault.key',''); setSync('', 'เฉพาะเครื่องนี้'); toast('ปิดซิงค์แล้ว'); };
-  $('#sPw').onclick = changeMaster;
-  $('#sWipe').onclick = async () => { if (await dialog({ title:'ล้างข้อมูลในเครื่องนี้?', text:'จะลบวอลต์ที่เก็บในเบราว์เซอร์นี้ทั้งหมด (ข้อมูลบนคลาวด์/ไฟล์สำรองไม่ถูกลบ)\nแน่ใจว่าสำรองไว้แล้ว', ok:'ล้างเลย', danger:true })){ ['vault.file','vault.dirty','vault.synced'].forEach(lsDel); location.reload(); } };
+  $('#sPw').onclick = changeMaster; $('#sDb').onclick = migrateSheet;
+  const off = $('#sDbOff'); if (off) off.onclick = () => { lsSet('vault.url',''); lsSet('vault.key',''); S.syncId = null; setSync('', 'ในเครื่อง'); toast('ตัดการเชื่อมต่อแล้ว — ข้อมูลยังอยู่ในเครื่อง'); settingsSheet(); };
+  $('#sWipe').onclick = async () => { if (await dialog({ title:'ล้างข้อมูลในเครื่องนี้?', text:'จะลบวอลต์ที่เก็บในเบราว์เซอร์นี้ทั้งหมด (ไฟล์สำรองที่ส่งออกไว้ไม่ถูกลบ)\nแน่ใจว่าสำรองไว้แล้ว', ok:'ล้างเลย', danger:true })){ ['vault.file','vault.dirty','vault.synced'].forEach(lsDel); location.reload(); } };
 }
-async function ensureSyncId(){ if (S.pwHold && cfg.url && cfg.key) S.syncId = await vaultId(S.pwHold); else S.syncId = null; }
+function migrateSheet(){
+  openSheet('ย้าย / เชื่อมฐานข้อมูล', `<p style="color:var(--muted);font-size:13.5px;margin:0 0 14px">รันไฟล์ <b>supabase-sync.sql</b> ในฐานข้อมูลปลายทางก่อน (Supabase → SQL Editor → Run) แล้วใส่ค่าด้านล่าง ระบบจะส่งข้อมูลที่เข้ารหัสแล้วไปให้</p>
+    <label class="field"><span>Supabase URL</span><input class="inp" id="mUrl" value="${esc(cfg.url)}" placeholder="https://xxxx.supabase.co" inputmode="url" autocomplete="off"></label>
+    <label class="field"><span>Publishable / anon key</span><input class="inp" id="mKey" value="${esc(cfg.key)}" placeholder="sb_publishable_… หรือ eyJ…" autocomplete="off"></label>`,
+    `<button class="btn ghost" id="mX">ยกเลิก</button><button class="btn primary" id="mGo">${ico('up')} ย้ายข้อมูล</button>`);
+  $('#mX').onclick = closeSheet;
+  $('#mGo').onclick = async () => {
+    const u = $('#mUrl').value.trim(), k = $('#mKey').value.trim(); if (!u || !k){ toast('ใส่ URL และ key ก่อน'); return; }
+    const old = [lsGet('vault.url'), lsGet('vault.key')], oldId = S.syncId;
+    lsSet('vault.url', u); lsSet('vault.key', k);
+    try { S.file = await seal(S.keys, S.vault); S.syncId = await vaultId(S.pwHold); await remotePut(S.file); lsDel('vault.dirty'); S.dirty = false; setSync('ok','ซิงค์แล้ว'); closeSheet(); toast('ย้ายข้อมูลเรียบร้อย ✓', 3500); }
+    catch(e){ if (old[0] === null) lsDel('vault.url'); else lsSet('vault.url', old[0]); if (old[1] === null) lsDel('vault.key'); else lsSet('vault.key', old[1]); S.syncId = oldId; toast('ย้ายไม่สำเร็จ: ' + e.message, 5000); }
+  };
+}
 async function changeMaster(){
-  const cur = await dialog({ title:'รหัสหลักปัจจุบัน', input:'รหัสหลักเดิม', type:'password', ok:'ต่อไป' }); if (cur === null) return;
-  if (cur !== S.pwHold){ toast('รหัสหลักเดิมไม่ถูกต้อง'); return; }
-  const n1 = await dialog({ title:'รหัสหลักใหม่', text:'ยาว 10 ตัวขึ้นไปหรือเป็นวลีหลายคำจะปลอดภัยกว่า', input:'รหัสหลักใหม่', type:'password', ok:'ต่อไป' }); if (!n1) return;
-  if (n1.length < 8){ toast('สั้นเกินไป (อย่างน้อย 8 ตัว)'); return; }
+  const cur = await dialog({ title:'PINปัจจุบัน', input:'PINเดิม', type:'password', ok:'ต่อไป' }); if (cur === null) return;
+  if (cur !== S.pwHold){ toast('PINเดิมไม่ถูกต้อง'); return; }
+  const n1 = await dialog({ title:'PINใหม่', text:'ยาว 10 ตัวขึ้นไปหรือเป็นวลีหลายคำจะปลอดภัยกว่า', input:'PINใหม่', type:'password', ok:'ต่อไป' }); if (!n1) return;
+  if (n1.length < 4){ toast('สั้นเกินไป (อย่างน้อย 4 ตัว)'); return; }
   const n2 = await dialog({ title:'ยืนยันรหัสใหม่', input:'พิมพ์อีกครั้ง', type:'password', ok:'เปลี่ยนรหัส' }); if (n2 !== n1){ toast('รหัสไม่ตรงกัน'); return; }
-  const oldId = S.syncId, hadSync = !!oldId;
   S.keys = await deriveKeys(n1, crypto.getRandomValues(new Uint8Array(16)), ITER); S.pwHold = n1;
-  await ensureSyncId(); await persist();
-  if (hadSync && cfg.url){ try { await fetch(`${cfg.url}/rest/v1/vault_blobs?id=eq.${oldId}`, { method:'DELETE', headers:{ apikey:cfg.key, Authorization:'Bearer '+cfg.key, 'x-vault-id': oldId } }); } catch {} }
-  toast('เปลี่ยนรหัสหลักแล้ว — โปรดส่งออกไฟล์สำรองใหม่', 4500);
+  const oldId = S.syncId; await ensureSyncId(); await persist();
+  if (oldId && oldId !== S.syncId && cfg.url){ try { await fetch(`${cfg.url}/rest/v1/vault_blobs?id=eq.${oldId}`, { method:'DELETE', headers:{ apikey:cfg.key, Authorization:'Bearer '+cfg.key, 'x-vault-id': oldId } }); } catch {} }
+  toast('เปลี่ยนPINแล้ว — โปรดส่งออกไฟล์สำรองใหม่', 4500);
 }
 $('#btnSet').onclick = settingsSheet;
 
@@ -839,22 +878,21 @@ $('#btnLock').onclick = () => lockNow();
 document.addEventListener('visibilitychange', () => { if (document.hidden && S.keys && lsGet('vault.hideLock') === '1') lockNow(); });
 
 function setMode(m){
-  S.mode = m;
-  const has = !!lsGet('vault.file');
+  S.mode = m; const has = !!lsGet('vault.file');
   $('#lockTabs').classList.toggle('hidden', m === 'unlock');
   $('#lockTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
-  $('#newBox').classList.toggle('hidden', m !== 'new');
   $('#fileBox').classList.toggle('hidden', m !== 'file');
-  $('#cloudBox').classList.toggle('hidden', m !== 'cloud');
+  $('#meterBox').classList.toggle('hidden', m !== 'new');
+  $('#dbBox').classList.toggle('hidden', m === 'unlock');
+  $('#newBox').classList.add('hidden');
   $('#lockTitle').textContent = 'Vault';
-  $('#lockSub').textContent = { unlock:'ใส่รหัสหลักเพื่อปลดล็อก', new:'สร้างรหัสหลัก — รหัสเดียวที่ต้องจำ', file:'กู้คืนจากไฟล์สำรอง (.vault)', cloud:'ดึงข้อมูลที่ซิงค์ไว้บน Supabase' }[m];
-  $('#pwLabel').textContent = m === 'new' ? 'ตั้งรหัสหลัก' : 'รหัสหลัก';
-  $('#lockBtn').textContent = { unlock:'ปลดล็อก', new:'สร้างวอลต์', file:'กู้คืน', cloud:'ดึงข้อมูล' }[m];
+  $('#lockSub').textContent = { unlock:'ใส่ PIN เพื่อเข้าใช้งาน', new:'ตั้ง PIN ของคุณ (ตัวเลขหรือตัวอักษร 4 ตัวขึ้นไป)', file:'กู้คืนจากไฟล์สำรอง (.vault)' }[m];
+  $('#lockBtn').textContent = { unlock:'เข้าใช้งาน', new:'เริ่มใช้งาน', file:'กู้คืน' }[m];
   $('#pw').autocomplete = m === 'new' ? 'new-password' : 'current-password';
-  $('#lockAlt').textContent = m === 'unlock' ? 'ใช้ไฟล์สำรอง / คลาวด์ / เริ่มใหม่' : (has ? '← กลับไปปลดล็อก' : '');
+  $('#lockAlt').textContent = m === 'unlock' ? 'ใช้ไฟล์สำรอง / เริ่มใหม่' : (has ? '← กลับไปใส่ PIN' : '');
   $('#lockAlt').classList.toggle('hidden', m !== 'unlock' && !has);
-  $('#lockErr').textContent = ''; $('#pw').value = ''; $('#pw2').value = ''; $('#ack').checked = false; meterLock();
-  if (m === 'cloud'){ $('#cfgUrl').value = cfg.url; $('#cfgKey').value = cfg.key; }
+  $('#lockErr').textContent = ''; $('#pw').value = ''; $('#pw2').value = ''; meterLock();
+  if (m !== 'unlock'){ $('#cfgUrl').value = cfg.url; $('#cfgKey').value = cfg.key; $('#dbBox').open = !!cfg.url; }
   setTimeout(() => $('#pw').focus(), 60);
 }
 $('#lockTabs').onclick = e => { const b = e.target.closest('[data-m]'); if (b) setMode(b.dataset.m); };
@@ -868,8 +906,7 @@ async function enter(){
   await wait(550);
   $('#lock').classList.add('gone'); $('#app').classList.add('on');
   S.filter = 'all'; render(); armLock();
-  await ensureSyncId();
-  if (syncOn()) sync(true); else setSync('', 'เฉพาะเครื่องนี้');
+  await ensureSyncId(); if (syncOn()) sync(true); else setSync('', 'ในเครื่อง');
   const last = +lsGet('vault.backup','0'), days = last ? (Date.now()-last)/86400000 : null;
   if (S.vault.entries.length && (days === null || days > 30)) setTimeout(() => toast(days === null ? 'ยังไม่เคยสำรอง — ตั้งค่า → ส่งออกไฟล์เข้ารหัส' : `ไม่ได้สำรองมา ${Math.floor(days)} วันแล้ว`, 5000), 1200);
 }
@@ -878,34 +915,36 @@ let busy = false;
 $('#lockForm').onsubmit = async ev => {
   ev.preventDefault(); if (busy) return;
   const pw = $('#pw').value, btn = $('#lockBtn'), label = btn.textContent; $('#lockErr').textContent = '';
-  if (!pw){ fail('กรุณาใส่รหัสหลัก'); return; }
+  if (!pw){ fail('กรุณาใส่PIN'); return; }
   busy = true; btn.disabled = true; btn.textContent = 'กำลังตรวจสอบ…'; await wait(30);
   try{
     if (S.mode === 'unlock'){
       const file = JSON.parse(lsGet('vault.file')); const keys = await keysFor(pw, file);
-      let v; try { v = await unseal(file, keys); } catch { fail('รหัสหลักไม่ถูกต้อง'); return; }
+      let v; try { v = await unseal(file, keys); } catch { fail('PINไม่ถูกต้อง'); return; }
       Object.assign(S, { keys, vault: v, file, pwHold: pw, dirty: lsGet('vault.dirty') === '1' }); await enter();
     } else if (S.mode === 'new'){
-      if (pw.length < 8){ fail('รหัสหลักควรยาวอย่างน้อย 8 ตัว'); return; }
-      if (pw !== $('#pw2').value){ fail('รหัสทั้งสองช่องไม่ตรงกัน'); return; }
-      if (!$('#ack').checked){ fail('กรุณาติ๊กยืนยันว่าเข้าใจเรื่องการลืมรหัส'); return; }
+      if (pw.length < 4){ fail('PIN ต้องมีอย่างน้อย 4 ตัว (ยาวกว่านี้ปลอดภัยกว่า)'); return; }
+      const u = $('#cfgUrl').value.trim(), k = $('#cfgKey').value.trim();
+      if (u || k){ lsSet('vault.url', u); lsSet('vault.key', k); }
+      if (cfg.url && cfg.key){
+        Object.assign(S, { syncId: await vaultId(pw), pwHold: pw });
+        let remote; try { remote = await remoteGet(); } catch(e){ S.syncId = null; fail('เชื่อมฐานข้อมูลไม่ได้: ' + e.message); return; }
+        if (remote){
+          const keys = await keysFor(pw, remote); let v; try { v = await unseal(remote, keys); } catch { S.syncId = null; fail('PIN ไม่ถูกต้อง'); return; }
+          Object.assign(S, { keys, vault: v, file: remote }); lsSet('vault.file', JSON.stringify(remote)); await enter(); toast('ดึงข้อมูลจากฐานข้อมูลแล้ว ✓'); return;
+        }
+      }
+      if ($('#newBox').classList.contains('hidden')){ $('#newBox').classList.remove('hidden'); $('#pw2').focus(); fail(cfg.url ? 'ยังไม่มีข้อมูลบนฐานข้อมูลนี้ — พิมพ์ PIN ซ้ำเพื่อสร้างใหม่' : 'พิมพ์ PIN ซ้ำอีกครั้งเพื่อสร้างวอลต์'); return; }
+      if (pw !== $('#pw2').value){ fail('PIN สองช่องไม่ตรงกัน'); return; }
       if (lsGet('vault.file') && !await dialog({ title:'มีวอลต์เดิมอยู่แล้ว', text:'การสร้างใหม่จะทับวอลต์ในเครื่องนี้ ดำเนินการต่อ?', ok:'ทับเลย', danger:true })) return;
       const keys = await deriveKeys(pw, crypto.getRandomValues(new Uint8Array(16)), ITER);
       Object.assign(S, { keys, vault: emptyVault(), pwHold: pw }); await persist(); await enter();
     } else if (S.mode === 'file'){
       const f = $('#lockFile').files[0]; if (!f){ fail('เลือกไฟล์ก่อน'); return; }
-      let r; try { r = await openAnyBackup(await readFileText(f), pw); } catch(e){ fail(e.message === 'bad-password' ? 'รหัสหลักไม่ถูกต้อง' : e.message); return; }
+      let r; try { r = await openAnyBackup(await readFileText(f), pw); } catch(e){ fail(e.message === 'bad-password' ? 'PINไม่ถูกต้อง' : e.message); return; }
       if (r.vault){ Object.assign(S, { keys: r.keys, vault: r.vault, file: r.file, pwHold: pw }); await persist(); }
       else { const keys = await deriveKeys(pw, crypto.getRandomValues(new Uint8Array(16)), ITER); Object.assign(S, { keys, vault: emptyVault(), pwHold: pw }); S.vault.entries = r.legacy.entries; await persist(); if (r.legacy.skippedFiles) setTimeout(() => toast(`ข้ามไฟล์แนบ ${r.legacy.skippedFiles} รายการ (เวอร์ชันนี้เก็บเฉพาะข้อความ)`, 6000), 1500); }
       lsSet('vault.backup', String(Date.now())); await enter();
-    } else if (S.mode === 'cloud'){
-      lsSet('vault.url', $('#cfgUrl').value.trim()); lsSet('vault.key', $('#cfgKey').value.trim());
-      if (!cfg.url || !cfg.key){ fail('ใส่ URL และ key ก่อน'); return; }
-      const id = await vaultId(pw); Object.assign(S, { syncId: id, pwHold: pw });
-      let remote; try { remote = await remoteGet(); } catch(e){ fail('เชื่อมต่อไม่ได้: ' + e.message); return; }
-      if (!remote){ fail('ไม่พบข้อมูลบนคลาวด์สำหรับรหัสนี้ (หรือรหัสไม่ถูก)'); return; }
-      const keys = await keysFor(pw, remote); let v; try { v = await unseal(remote, keys); } catch { fail('รหัสหลักไม่ถูกต้อง'); return; }
-      Object.assign(S, { keys, vault: v, file: remote }); lsSet('vault.file', JSON.stringify(remote)); await enter();
     }
   } catch(e){ fail('เกิดข้อผิดพลาด: ' + e.message); }
   finally { busy = false; btn.disabled = false; btn.textContent = label; }
@@ -914,7 +953,7 @@ $('#lockForm').onsubmit = async ev => {
 /* ============================ theme / shortcuts / boot ============================ */
 function setTheme(t){ document.documentElement.dataset.theme = t; $('#btnTheme').innerHTML = ico(t === 'dark' ? 'sun' : 'moon'); document.querySelector('meta[name=theme-color]').content = t === 'dark' ? '#0b0d14' : '#f3f4fb'; lsSet('vault.theme', t); }
 $('#btnTheme').onclick = () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
-$('#syncChip').onclick = () => { if (!syncOn()) settingsSheet(); else sync(false); };
+$('#syncChip').onclick = () => { if (!syncOn()) migrateSheet(); else sync(false); };
 document.addEventListener('keydown', e => {
   if (!S.keys) return;
   const typing = /INPUT|TEXTAREA/.test(document.activeElement.tagName);
@@ -925,6 +964,7 @@ document.addEventListener('keydown', e => {
 setTheme(lsGet('vault.theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
 setMode(lsGet('vault.file') ? 'unlock' : 'new');
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+setTimeout(() => $('#splash').classList.add('gone'), 1700);
 </script>
 </body>
 </html>
