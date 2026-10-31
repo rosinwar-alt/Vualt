@@ -1,5 +1,5 @@
 // Vault — service worker: แคชเฉพาะตัวแอป ให้เปิดได้แม้ไม่มีเน็ต (ไม่แตะ request ไป Supabase)
-const CACHE = 'vault-shell-v6';
+const CACHE = 'vault-shell-v9';
 const SHELL = ['./', './index.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).catch(() => {})); self.skipWaiting(); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x !== CACHE).map(x => caches.delete(x))))); self.clients.claim(); });

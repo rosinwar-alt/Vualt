@@ -218,6 +218,14 @@ input[type=range]{width:100%;accent-color:var(--accent);height:30px}
 .dbbox .hint{color:var(--muted);font-size:12.5px;margin:0 0 12px}
 .pin{letter-spacing:.12em;font-size:18px}
 @media(max-width:640px){.inp,textarea,select{font-size:16px!important}.lock-card{padding:22px 18px}.stats{gap:8px}.main{padding-left:14px;padding-right:14px}.grid{grid-template-columns:1fr!important}}
+html,body{overflow-x:hidden;max-width:100%}
+#app.on{animation:fadeup .6s var(--ease) backwards}
+.grid{grid-template-columns:repeat(auto-fill,minmax(min(310px,100%),1fr))}
+.grid>*,.card{min-width:0;max-width:100%}
+@media(max-width:640px){.grid{grid-template-columns:minmax(0,1fr)!important}}
+.field>span{letter-spacing:0}.set-sec h4{letter-spacing:0;text-transform:none}
+.pin{letter-spacing:0}.pin:not(:placeholder-shown){letter-spacing:.12em}.pin::placeholder{font-size:14px;letter-spacing:0}
+.hint{color:var(--muted);font-size:12.5px;margin:0 0 12px;line-height:1.6}
 </style>
 </head>
 <body>
@@ -265,16 +273,18 @@ input[type=range]{width:100%;accent-color:var(--accent);height:30px}
     <div class="tabs hidden" id="lockTabs"><button data-m="new">เริ่มใช้งาน</button><button data-m="file">จากไฟล์สำรอง</button></div>
     <form id="lockForm" autocomplete="off">
       <div id="fileBox" class="hidden"><label class="field"><span>ไฟล์สำรอง (.vault)</span><input class="inp" type="file" id="lockFile" accept=".vault,.json,application/json"></label></div>
-      <label class="field"><span id="pwLabel">PIN</span>
+      <p class="hint hidden" id="dbLink">🗄️ <span id="dbName"></span> · <button type="button" class="linkbtn" id="dbChange">เปลี่ยน</button></p>
+      <label class="field" id="pwField"><span id="pwLabel">PIN</span>
         <div class="inp-wrap"><input class="inp pin" id="pw" type="password" placeholder="ตัวเลขหรือตัวอักษร 4 ตัวขึ้นไป" autocomplete="current-password" autofocus><button type="button" class="icon-btn" id="pwEye" aria-label="แสดง PIN"><svg class="i"><use href="#i-eye"/></svg></button></div>
       </label>
       <div id="meterBox" class="hidden"><div class="meter"><b id="mBar"></b></div><div class="meter-t" id="mTxt"></div></div>
-      <div id="newBox" class="hidden"><label class="field"><span>พิมพ์ PIN อีกครั้งเพื่อสร้างวอลต์ใหม่</span><input class="inp pin" id="pw2" type="password" autocomplete="new-password"></label></div>
-      <details id="dbBox" class="dbbox"><summary>🗄️ ฐานข้อมูล Supabase <small>(ไม่บังคับ — ไว้ใช้หลายเครื่อง)</small></summary>
-        <label class="field"><span>Supabase URL</span><input class="inp" id="cfgUrl" placeholder="https://xxxx.supabase.co" inputmode="url" autocomplete="off"></label>
-        <label class="field"><span>Publishable / anon key</span><input class="inp" id="cfgKey" placeholder="sb_publishable_… หรือ eyJ…" autocomplete="off"></label>
-        <p class="hint">ถ้ามีข้อมูลเดิมในฐานข้อมูล แค่ใส่ PIN เดิมก็ดึงมาให้เอง ถ้าข้ามไว้ ข้อมูลจะอยู่ในเครื่องนี้เท่านั้น</p>
-      </details>
+      <div id="newBox" class="hidden"><label class="field"><span>พิมพ์ PIN อีกครั้งเพื่อยืนยัน</span><input class="inp pin" id="pw2" type="password" autocomplete="new-password"></label></div>
+      <div id="dbStep" class="hidden">
+        <label class="field"><span>Supabase URL</span><input class="inp" id="cfgUrl" placeholder="https://xxxx.supabase.co" inputmode="url" autocapitalize="off" autocomplete="off"></label>
+        <label class="field"><span>Anon / Publishable key</span><input class="inp" id="cfgKey" placeholder="sb_publishable_… หรือ eyJ…" autocapitalize="off" autocomplete="off"></label>
+        <p class="hint">หาได้ที่ Supabase → Project Settings → API<br>ฐานข้อมูลใหม่ต้องรัน <b>supabase-sync.sql</b> ใน SQL Editor ก่อน 1 ครั้ง</p>
+        <div style="text-align:center"><button type="button" class="linkbtn" id="dbSkip">ข้าม — ใช้ในเครื่องนี้ก่อน</button></div>
+      </div>
       <p class="err" id="lockErr"></p>
       <button class="btn primary block" id="lockBtn" type="submit">ปลดล็อก</button>
     </form>
@@ -310,8 +320,8 @@ input[type=range]{width:100%;accent-color:var(--accent);height:30px}
 
 <script>
 'use strict';
-const DEFAULT_SUPABASE_URL = '';  // ใส่ URL ของ Supabase ตรงนี้ได้ จะได้ไม่ต้องกรอกบนมือถือ
-const DEFAULT_SUPABASE_KEY = '';  // publishable/anon key (คีย์สาธารณะ ใส่ได้)
+const DEFAULT_SUPABASE_URL = '';  // ใส่ URL ของ Supabase ตรงนี้ได้
+const DEFAULT_SUPABASE_KEY = '';  // ⚠️ ถ้าใส่ key ตรงนี้ อย่าเผยแพร่โค้ดสู่สาธารณะ (ใครมี URL+key ก็ดึงข้อมูลที่เข้ารหัสไปได้)
 
 /* ============================ helpers ============================ */
 const $ = s => document.querySelector(s);
@@ -344,12 +354,9 @@ async function deriveKeys(pw, salt, iter){
   bits.fill(0);
   return { enc, mac, salt, iter };
 }
-// id สำหรับซิงค์: คำนวณจากรหัสหลักอย่างเดียว (salt คงที่) เพื่อให้เครื่องใหม่หาข้อมูลเจอ โดยเซิร์ฟเวอร์ไม่รู้รหัส
-async function vaultId(pw){
-  const base = await crypto.subtle.importKey('raw', te.encode(norm(pw)), 'PBKDF2', false, ['deriveBits']);
-  const bits = new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2', salt: te.encode('vault-sync-id-v1'), iterations: 200000, hash:'SHA-256'}, base, 256));
-  return hex(bits);
-}
+// ID ของข้อมูลบนฐานข้อมูลเป็นค่าคงที่ (ไม่ผูกกับ PIN) -> ใส่ PIN ผิดจะไม่สร้างข้อมูลใหม่ PIN ใช้แค่ถอดรหัส
+const VAULT_ID = hex(te.encode('vault-main')).padEnd(64, '0');
+async function vaultId(){ return VAULT_ID; }
 async function seal(keys, obj){
   const iv = crypto.getRandomValues(new Uint8Array(16));
   const ct = new Uint8Array(await crypto.subtle.encrypt({name:'AES-CBC', iv}, keys.enc, te.encode(JSON.stringify(obj))));
@@ -845,7 +852,9 @@ function migrateSheet(){
     const u = $('#mUrl').value.trim(), k = $('#mKey').value.trim(); if (!u || !k){ toast('ใส่ URL และ key ก่อน'); return; }
     const old = [lsGet('vault.url'), lsGet('vault.key')], oldId = S.syncId;
     lsSet('vault.url', u); lsSet('vault.key', k);
-    try { S.file = await seal(S.keys, S.vault); S.syncId = await vaultId(S.pwHold); await remotePut(S.file); lsDel('vault.dirty'); S.dirty = false; setSync('ok','ซิงค์แล้ว'); closeSheet(); toast('ย้ายข้อมูลเรียบร้อย ✓', 3500); }
+    try { S.syncId = VAULT_ID; const rem = await remoteGet();
+      if (rem){ let rv; try { rv = await unseal(rem, await keysFor(S.pwHold, rem)); } catch { throw new Error('ปลายทางมีข้อมูลที่ใช้ PIN อื่นอยู่แล้ว — ไม่ย้ายเพื่อกันข้อมูลทับ'); } S.vault = mergeVaults(S.vault, rv); }
+      S.file = await seal(S.keys, S.vault); lsSet('vault.file', JSON.stringify(S.file)); await remotePut(S.file); lsDel('vault.dirty'); S.dirty = false; setSync('ok','ซิงค์แล้ว'); closeSheet(); toast('ย้ายข้อมูลเรียบร้อย ✓', 3500); }
     catch(e){ if (old[0] === null) lsDel('vault.url'); else lsSet('vault.url', old[0]); if (old[1] === null) lsDel('vault.key'); else lsSet('vault.key', old[1]); S.syncId = oldId; toast('ย้ายไม่สำเร็จ: ' + e.message, 5000); }
   };
 }
@@ -881,22 +890,55 @@ document.addEventListener('visibilitychange', () => { if (document.hidden && S.k
 
 function setMode(m){
   S.mode = m; const has = !!lsGet('vault.file');
+  const dbOn = !!(cfg.url && cfg.key);
+  const step = m === 'new' && (S.forceDb || (!dbOn && lsGet('vault.skipdb') !== '1')) ? 'db' : 'pin'; S.forceDb = false; S.step = step;
+  const isDb = m === 'new' && step === 'db', isPin = m === 'new' && step === 'pin';
   $('#lockTabs').classList.toggle('hidden', m === 'unlock');
   $('#lockTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
   $('#fileBox').classList.toggle('hidden', m !== 'file');
-  $('#meterBox').classList.toggle('hidden', m !== 'new');
-  $('#dbBox').classList.toggle('hidden', m === 'unlock');
-  $('#newBox').classList.add('hidden');
+  $('#dbStep').classList.toggle('hidden', !isDb);
+  $('#pwField').classList.toggle('hidden', isDb);
+  $('#dbLink').classList.toggle('hidden', !isPin);
+  $('#pwLabel').textContent = 'PIN';
+  $('#dbName').textContent = dbOn ? cfg.url.replace(/^https?:\/\//,'') : 'ยังไม่เชื่อมฐานข้อมูล (ข้อมูลอยู่ในเครื่อง)';
+  $('#dbChange').textContent = dbOn ? 'เปลี่ยน' : 'เชื่อม';
   $('#lockTitle').textContent = 'Vault';
-  $('#lockSub').textContent = { unlock:'ใส่ PIN เพื่อเข้าใช้งาน', new:'ตั้ง PIN ของคุณ (ตัวเลขหรือตัวอักษร 4 ตัวขึ้นไป)', file:'กู้คืนจากไฟล์สำรอง (.vault)' }[m];
-  $('#lockBtn').textContent = { unlock:'เข้าใช้งาน', new:'เริ่มใช้งาน', file:'กู้คืน' }[m];
+  $('#lockSub').textContent = isDb ? 'ขั้นที่ 1 จาก 2 — เชื่อมฐานข้อมูล' : isPin ? 'ขั้นที่ 2 จาก 2 — ตั้ง PIN (ตัวเลขหรือตัวอักษร 4 ตัวขึ้นไป)' : { unlock:'ใส่ PIN เพื่อเข้าใช้งาน', file:'กู้คืนจากไฟล์สำรอง (.vault)' }[m];
+  $('#lockBtn').textContent = isDb ? 'ต่อไป' : { unlock:'เข้าใช้งาน', new:'เริ่มใช้งาน', file:'กู้คืน' }[m];
   $('#pw').autocomplete = m === 'new' ? 'new-password' : 'current-password';
   $('#lockAlt').textContent = m === 'unlock' ? 'ใช้ไฟล์สำรอง / เริ่มใหม่' : (has ? '← กลับไปใส่ PIN' : '');
   $('#lockAlt').classList.toggle('hidden', m !== 'unlock' && !has);
   $('#lockErr').textContent = ''; $('#pw').value = ''; $('#pw2').value = ''; meterLock();
-  if (m !== 'unlock'){ $('#cfgUrl').value = cfg.url; $('#cfgKey').value = cfg.key; $('#dbBox').open = !!cfg.url; }
-  setTimeout(() => $('#pw').focus(), 60);
+  $('#meterBox').classList.add('hidden'); $('#newBox').classList.add('hidden');
+  if (isPin){ if (!dbOn) S.remote = null; applyPin(); if (dbOn && S.remote === undefined) probeRemote(); }
+  if (isDb){ $('#cfgUrl').value = cfg.url; $('#cfgKey').value = cfg.key; }
+  setTimeout(() => (isDb ? $('#cfgUrl') : $('#pw')).focus(), 60);
 }
+function applyPin(){
+  const found = !!S.remote;
+  $('#meterBox').classList.toggle('hidden', found); $('#newBox').classList.toggle('hidden', found);
+  $('#lockSub').textContent = found ? 'พบข้อมูลเดิมในฐานข้อมูล — ใส่ PIN เดิมเพื่อเปิด' : 'ขั้นที่ 2 จาก 2 — ตั้ง PIN (ตัวเลขหรือตัวอักษร 4 ตัวขึ้นไป)';
+  $('#lockBtn').textContent = found ? 'เปิดข้อมูลเดิม' : 'เริ่มใช้งาน';
+  $('#pwLabel').textContent = found ? 'PIN เดิม' : 'ตั้ง PIN';
+  $('#pw').autocomplete = found ? 'current-password' : 'new-password';
+}
+async function probeRemote(){ S.syncId = VAULT_ID; try { S.remote = await remoteGet(); } catch { S.remote = undefined; setTimeout(() => { if (S.mode === 'new' && S.step === 'pin') fail('เช็คฐานข้อมูลไม่ได้ — ตรวจเน็ต แล้วลองกดเริ่มใช้งานอีกครั้ง'); }, 100); } if (S.mode === 'new' && S.step === 'pin') applyPin(); }
+async function connectDb(){
+  const u = cleanUrl($('#cfgUrl').value), k = $('#cfgKey').value.replace(/\s+/g,''), btn = $('#lockBtn');
+  if (!u || !k){ fail('ใส่ URL และ key ให้ครบ'); return; }
+  btn.disabled = true; btn.textContent = 'กำลังตรวจสอบ…';
+  try{
+    const r = await fetch(`${u}/rest/v1/vault_blobs?id=eq.${VAULT_ID}&select=data`, { headers:{ apikey:k, Authorization:'Bearer ' + k, 'x-vault-id': VAULT_ID } });
+    if (r.status === 404){ const t = await r.text(); fail(/PGRST205|vault_blobs/.test(t) ? 'ยังไม่ได้รัน supabase-sync.sql ในฐานข้อมูลนี้ (Supabase → SQL Editor → Run)' : 'URL ไม่ถูกต้อง — ใช้แบบ https://xxxx.supabase.co'); return; }
+    if (r.status === 401 || r.status === 403){ fail('key ไม่ถูกต้อง — ใช้ publishable หรือ anon key'); return; }
+    if (!r.ok){ fail('เชื่อมต่อไม่ได้ (HTTP ' + r.status + ')'); return; }
+    const j = await r.json(); S.remote = j[0]?.data || null;
+  } catch { fail('เชื่อมต่อไม่ได้ — เช็คอินเทอร์เน็ตและ URL'); return; }
+  finally { btn.disabled = false; btn.textContent = 'ต่อไป'; }
+  lsSet('vault.url', u); lsSet('vault.key', k); lsDel('vault.skipdb'); toast(S.remote ? 'เชื่อมแล้ว — พบข้อมูลเดิมในฐานข้อมูล ✓' : 'เชื่อมฐานข้อมูลแล้ว ✓'); setMode('new');
+}
+$('#dbSkip').onclick = () => { lsSet('vault.skipdb', '1'); S.remote = null; setMode('new'); };
+$('#dbChange').onclick = () => { S.forceDb = true; S.remote = undefined; setMode('new'); };
 $('#lockTabs').onclick = e => { const b = e.target.closest('[data-m]'); if (b) setMode(b.dataset.m); };
 $('#lockAlt').onclick = () => setMode(S.mode === 'unlock' ? 'file' : 'unlock');
 $('#pwEye').onclick = () => { const p = $('#pw'); const on = p.type === 'password'; p.type = on ? 'text' : 'password'; $('#pw2').type = p.type; $('#pwEye').innerHTML = ico(on ? 'eyeoff' : 'eye'); };
@@ -916,6 +958,7 @@ function fail(msg){ $('#lockErr').textContent = msg; const c = $('#lockCard'); c
 let busy = false;
 $('#lockForm').onsubmit = async ev => {
   ev.preventDefault(); if (busy) return;
+  if (S.mode === 'new' && S.step === 'db'){ busy = true; try { await connectDb(); } finally { busy = false; } return; }
   const pw = $('#pw').value, btn = $('#lockBtn'), label = btn.textContent; $('#lockErr').textContent = '';
   if (!pw){ fail('กรุณาใส่PIN'); return; }
   busy = true; btn.disabled = true; btn.textContent = 'กำลังตรวจสอบ…'; await wait(30);
@@ -926,21 +969,20 @@ $('#lockForm').onsubmit = async ev => {
       Object.assign(S, { keys, vault: v, file, pwHold: pw, dirty: lsGet('vault.dirty') === '1' }); await enter();
     } else if (S.mode === 'new'){
       if (pw.length < 4){ fail('PIN ต้องมีอย่างน้อย 4 ตัว (ยาวกว่านี้ปลอดภัยกว่า)'); return; }
-      const u = $('#cfgUrl').value.trim(), k = $('#cfgKey').value.trim();
-      if (u || k){ lsSet('vault.url', u); lsSet('vault.key', k); }
-      if (cfg.url && cfg.key){
-        Object.assign(S, { syncId: await vaultId(pw), pwHold: pw });
-        let remote; try { remote = await remoteGet(); } catch(e){ S.syncId = null; fail('เชื่อมฐานข้อมูลไม่ได้: ' + e.message); return; }
-        if (remote){
-          const keys = await keysFor(pw, remote); let v; try { v = await unseal(remote, keys); } catch { S.syncId = null; fail('PIN ไม่ถูกต้อง'); return; }
-          Object.assign(S, { keys, vault: v, file: remote }); lsSet('vault.file', JSON.stringify(remote)); await enter(); toast('ดึงข้อมูลจากฐานข้อมูลแล้ว ✓'); return;
+      const dbOn = !!(cfg.url && cfg.key);
+      if (dbOn){
+        S.syncId = VAULT_ID;
+        if (S.remote === undefined){ try { S.remote = await remoteGet(); } catch(e){ fail('เชื่อมฐานข้อมูลไม่ได้: ' + e.message); return; } }
+        if (S.remote){
+          const remote = S.remote, keys = await keysFor(pw, remote); let v;
+          try { v = await unseal(remote, keys); } catch { fail('PIN ไม่ถูกต้อง'); return; }
+          Object.assign(S, { keys, vault: v, file: remote, pwHold: pw }); lsSet('vault.file', JSON.stringify(remote)); await enter(); toast('เปิดข้อมูลเดิมจากฐานข้อมูลแล้ว ✓'); return;
         }
       }
-      if ($('#newBox').classList.contains('hidden')){ $('#newBox').classList.remove('hidden'); $('#pw2').focus(); fail(cfg.url ? 'ยังไม่มีข้อมูลบนฐานข้อมูลนี้ — พิมพ์ PIN ซ้ำเพื่อสร้างใหม่' : 'พิมพ์ PIN ซ้ำอีกครั้งเพื่อสร้างวอลต์'); return; }
       if (pw !== $('#pw2').value){ fail('PIN สองช่องไม่ตรงกัน'); return; }
       if (lsGet('vault.file') && !await dialog({ title:'มีวอลต์เดิมอยู่แล้ว', text:'การสร้างใหม่จะทับวอลต์ในเครื่องนี้ ดำเนินการต่อ?', ok:'ทับเลย', danger:true })) return;
       const keys = await deriveKeys(pw, crypto.getRandomValues(new Uint8Array(16)), ITER);
-      Object.assign(S, { keys, vault: emptyVault(), pwHold: pw }); await persist(); await enter();
+      Object.assign(S, { keys, vault: emptyVault(), pwHold: pw, syncId: dbOn ? VAULT_ID : null }); await persist(); await enter();
     } else if (S.mode === 'file'){
       const f = $('#lockFile').files[0]; if (!f){ fail('เลือกไฟล์ก่อน'); return; }
       let r; try { r = await openAnyBackup(await readFileText(f), pw); } catch(e){ fail(e.message === 'bad-password' ? 'PINไม่ถูกต้อง' : e.message); return; }
