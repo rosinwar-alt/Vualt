@@ -226,6 +226,48 @@ html,body{overflow-x:hidden;max-width:100%}
 .field>span{letter-spacing:0}.set-sec h4{letter-spacing:0;text-transform:none}
 .pin{letter-spacing:0}.pin:not(:placeholder-shown){letter-spacing:.12em}.pin::placeholder{font-size:14px;letter-spacing:0}
 .hint{color:var(--muted);font-size:12.5px;margin:0 0 12px;line-height:1.6}
+/* v8 */
+.av svg.i{width:52%;height:52%;stroke-width:2}
+.av{overflow:hidden;position:relative}
+.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.alert{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 14px;margin:0 0 14px;border-radius:14px;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.35);color:var(--text);font-size:13.5px}
+.alert svg{color:var(--warn);width:1.4em;height:1.4em}.alert b{color:var(--warn)}
+.seg{display:flex;gap:4px;background:var(--surface2);border-radius:16px;padding:4px;margin:0 0 12px}
+.seg button{flex:1;min-width:0;min-height:42px;border-radius:12px;font-weight:600;font-size:13.5px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;transition:.3s var(--spring)}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.seg small{opacity:.7;font-weight:500}
+.row-label{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);font-weight:600;margin-right:2px}
+.groups{align-items:center}
+.listbar{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px;color:var(--muted);font-size:12.5px}
+.listbar .linkbtn{display:inline-flex;align-items:center;gap:5px;padding:6px 4px;text-decoration:none}
+.empty-act{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.sec-h{display:flex;align-items:center;gap:7px;margin:14px 0 10px;font-size:13px;font-weight:700;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px;border-radius:18px;background:var(--surface2);text-align:left;border:1.5px solid transparent;transition:.25s var(--spring)}
+.tile:hover{transform:translateY(-3px);border-color:var(--accent)}
+.tile .av{width:42px;height:42px;margin-bottom:6px;border-radius:13px}
+.tile b{font-size:14.5px}.tile small{color:var(--muted);font-size:12px;line-height:1.35}
+.kpill-row{margin:0 0 14px}
+.kpill{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:0 14px;border-radius:999px;background:rgba(124,92,255,.16);font-weight:700;font-size:13.5px}
+.kpill small{color:var(--muted);font-weight:500}
+button.kpill:hover{background:rgba(124,92,255,.28)}
+.addimg,.catpick{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.catpick .chip{min-height:34px;font-size:13px}
+.icrow{display:flex;align-items:center;gap:10px;margin:0 0 10px}.icrow .av{width:44px;height:44px;font-size:22px}
+.emo{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin:0 0 14px}
+.emo button{aspect-ratio:1;font-size:21px;border-radius:10px;background:var(--surface2)}.emo button:hover{background:var(--accent)}
+.sheet-f .btn.sq{flex:0 0 48px;padding:0}
+.imgc img{cursor:zoom-in}
+#lb{position:fixed;inset:0;z-index:85;background:rgba(0,0,0,.93);display:grid;place-items:center;animation:fade .2s both}
+#lb img{max-width:100%;max-height:80dvh;object-fit:contain;border-radius:6px}
+.lb-bar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:6px;padding:calc(8px + var(--safe-t)) 12px 8px;color:#fff;background:linear-gradient(rgba(0,0,0,.6),transparent)}
+.lb-bar span{flex:1;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-bar .icon-btn,.lb-nav{color:#fff}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:64px;display:grid;place-items:center;background:rgba(255,255,255,.1);border-radius:14px}
+.lb-nav.prev{left:8px}.lb-nav.prev svg{transform:scaleX(-1)}.lb-nav.next{right:8px}
+.toast .act{margin-left:6px;padding:4px 12px;border-radius:999px;background:rgba(124,92,255,.25);color:var(--accent);font-weight:700}
+.set-info{color:var(--muted);font-size:13px;margin:0 0 10px;line-height:1.6}
+@media(max-width:480px){.seg button svg{display:none}.seg button{font-size:13px;gap:4px}.emo{grid-template-columns:repeat(6,1fr)}}
 </style>
 </head>
 <body>
@@ -255,6 +297,24 @@ html,body{overflow-x:hidden;max-width:100%}
 <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></symbol>
 <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
 <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.2 8 8 9 4.8-1 8-4.5 8-9V6Z"/><path d="m9 12 2 2 4-4"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="i-game" viewBox="0 0 24 24"><path d="M7 6h10a4 4 0 0 1 4 4v4a3 3 0 0 1-5.2 2L14.5 14h-5l-1.3 2A3 3 0 0 1 3 14v-4a4 4 0 0 1 4-4Z"/><path d="M7.5 9.5v3M6 11h3"/><circle cx="15.5" cy="10" r=".7"/><circle cx="17.5" cy="12" r=".7"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3.5 7 8.5 6 8.5-6"/></symbol>
+<symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></symbol>
+<symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2 9a15 15 0 0 1 20 0M5 12.5a10.5 10.5 0 0 1 14 0M8.5 16a5.5 5.5 0 0 1 7 0"/><circle cx="12" cy="19.5" r=".8"/></symbol>
+<symbol id="i-card" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6 15h4"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l3 3M14 9l2 2"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></symbol>
+<symbol id="i-note" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6Z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></symbol>
+<symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-8 8"/></symbol>
+<symbol id="i-idcard" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><circle cx="8.5" cy="11" r="2"/><path d="M5.5 16a3.2 3.2 0 0 1 6 0M14 10h4M14 14h3"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.8"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.8"/></symbol>
+<symbol id="i-sort" viewBox="0 0 24 24"><path d="M7 4v16m0 0-3-3m3 3 3-3M17 20V4m0 0-3 3m3-3 3 3"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19Z"/><path d="M12 10v4.5M12 17.5h.01"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5h.01"/></symbol>
 </defs></svg>
 
 <!-- LOCK SCREEN -->
@@ -303,16 +363,19 @@ html,body{overflow-x:hidden;max-width:100%}
     <button class="icon-btn" id="btnLock" aria-label="ล็อก"><svg class="i"><use href="#i-lock"/></svg></button>
   </div></header>
   <main class="main">
-    <div class="stats" id="stats"></div>
+    <div id="stats"></div>
+    <div class="seg" id="seg"></div>
     <div class="filters" id="filters"></div>
     <div class="groups" id="groups"></div>
+    <div class="listbar"><span id="lcount"></span><button class="linkbtn" id="sortBtn" type="button"></button></div>
     <div class="grid" id="grid"></div>
-    <div class="empty hidden" id="empty"><span class="big">🗝️</span><b>ยังไม่มีรายการ</b><p>กดปุ่ม ＋ มุมขวาล่างเพื่อเพิ่มรายการแรก<br>หรือวางหลายบัญชีพร้อมกันได้ที่ ตั้งค่า → นำเข้า</p></div>
-    <p class="foot">เข้ารหัสในเครื่องคุณ · ไม่มีใครอ่านข้อมูลได้นอกจากPINของคุณ</p>
+    <div class="empty hidden" id="empty"><span class="big">🗝️</span><b>ยังไม่มีรายการ</b><p id="emptyP"></p><div class="empty-act" id="emptyAct"><button class="btn primary" data-addk="login">＋ เพิ่มรหัสผ่าน</button><button class="btn ghost" data-addk="photo">＋ เพิ่มรูป / เอกสาร</button></div></div>
+    <p class="foot">เข้ารหัสในเครื่องคุณ · ไม่มีใครอ่านข้อมูลได้นอกจาก PIN ของคุณ</p>
   </main>
   <button class="fab" id="fab" aria-label="เพิ่มรายการ"><svg class="i"><use href="#i-plus"/></svg></button>
 </div>
 
+<div id="lb" class="hidden"><div class="lb-bar"><span id="lbN"></span><button class="icon-btn" id="lbDl" aria-label="ดาวน์โหลด"><svg class="i"><use href="#i-down"/></svg></button><button class="icon-btn" id="lbX" aria-label="ปิด"><svg class="i"><use href="#i-x"/></svg></button></div><button class="lb-nav prev" id="lbPrev" aria-label="ก่อนหน้า"><svg class="i"><use href="#i-chev"/></svg></button><img id="lbImg" alt=""><button class="lb-nav next" id="lbNext" aria-label="ถัดไป"><svg class="i"><use href="#i-chev"/></svg></button></div>
 <div id="scrim"></div>
 <aside id="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div class="sheet-h"><h2 id="sheetT"></h2><button class="icon-btn" id="sheetX" aria-label="ปิด"><svg class="i"><use href="#i-x"/></svg></button></div><div class="sheet-b" id="sheetB"></div><div class="sheet-f hidden" id="sheetF"></div></aside>
 <div id="toasts"></div>
@@ -332,6 +395,18 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 const lsGet = (k, d=null) => { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch { return d; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, v); return true; } catch { return false; } };
 const lsDel = k => { try { localStorage.removeItem(k); } catch {} };
+// เก็บวอลต์ในเครื่องด้วย IndexedDB (รูปเยอะได้ ไม่ติดเพดาน 5MB ของ localStorage) · ถ้าใช้ไม่ได้จะถอยไป localStorage
+const IDB = (() => {
+  let p = null;
+  const open = () => p || (p = new Promise((res, rej) => { try { const r = indexedDB.open('vault', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); } catch (e) { rej(e); } }));
+  const tx = (mode, fn) => open().then(db => new Promise((res, rej) => { const t = db.transaction('kv', mode); const q = fn(t.objectStore('kv')); t.oncomplete = () => res(q.result); t.onerror = t.onabort = () => rej(t.error); }));
+  return { get: k => tx('readonly', s => s.get(k)), set: (k, v) => tx('readwrite', s => s.put(v, k)), del: k => tx('readwrite', s => s.delete(k)) };
+})();
+let LOCAL = null;
+const localFile = () => LOCAL;
+async function saveLocal(str){ LOCAL = str; try { await IDB.set('file', str); lsDel('vault.file'); return true; } catch { return lsSet('vault.file', str); } }
+async function clearLocal(){ LOCAL = null; try { await IDB.del('file'); } catch {} lsDel('vault.file'); }
+async function initLocal(){ try { LOCAL = (await IDB.get('file')) ?? null; } catch {} if (LOCAL === null){ const old = lsGet('vault.file'); if (old){ LOCAL = old; await saveLocal(old); } } }
 const uid = () => { const a = crypto.getRandomValues(new Uint8Array(12)); return [...a].map(b => b.toString(16).padStart(2,'0')).join(''); };
 function b64(buf){ const u = new Uint8Array(buf); let s=''; for (let i=0;i<u.length;i+=0x8000) s += String.fromCharCode.apply(null, u.subarray(i,i+0x8000)); return btoa(s); }
 function unb64(s){ const bin = atob(s), u = new Uint8Array(bin.length); for (let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return u; }
@@ -356,7 +431,6 @@ async function deriveKeys(pw, salt, iter){
 }
 // ID ของข้อมูลบนฐานข้อมูลเป็นค่าคงที่ (ไม่ผูกกับ PIN) -> ใส่ PIN ผิดจะไม่สร้างข้อมูลใหม่ PIN ใช้แค่ถอดรหัส
 const VAULT_ID = hex(te.encode('vault-main')).padEnd(64, '0');
-async function vaultId(){ return VAULT_ID; }
 async function seal(keys, obj){
   const iv = crypto.getRandomValues(new Uint8Array(16));
   const ct = new Uint8Array(await crypto.subtle.encrypt({name:'AES-CBC', iv}, keys.enc, te.encode(JSON.stringify(obj))));
@@ -393,33 +467,58 @@ async function openLegacy(backup, pw){
 }
 
 /* ============================ vault model ============================ */
+/* ============================ vault model ============================ */
+// sec: pw = รหัสผ่าน & ข้อมูลลับ · media = รูป & เอกสาร | s = ช่องลับ(ซ่อน) m = หลายบรรทัด | b = ใช้โลโก้แบรนด์ตามชื่อ | h = ตรวจสุขภาพรหัส
+const SECS = { pw:{ n:'รหัสผ่าน & ข้อมูลลับ', ic:'key' }, media:{ n:'รูป & เอกสาร', ic:'image' } };
 const KINDS = {
-  login:{ n:'บัญชี', e:'🔐', f:[{l:'ชื่อผู้ใช้/อีเมล',s:0},{l:'รหัสผ่าน',s:1}], gen:1 },
-  game: { n:'เกม',   e:'🎮', f:[{l:'ชื่อผู้ใช้/อีเมล',s:0},{l:'รหัสผ่าน',s:1}], gen:1 },
-  card: { n:'บัตร',  e:'💳', f:[{l:'ชื่อบนบัตร',s:0},{l:'เลขบัตร',s:1},{l:'หมดอายุ',s:0},{l:'CVV',s:1}] },
-  wifi: { n:'Wi-Fi', e:'📶', f:[{l:'ชื่อเครือข่าย',s:0},{l:'รหัสผ่าน',s:1}], gen:1 },
-  note: { n:'โน้ตลับ',e:'📝', f:[{l:'โน้ต',s:1,m:1}] },
+  login:{ n:'บัญชีเว็บ / แอป', sec:'pw', ic:'user', c:'#7c5cff', d:'Facebook, LINE, Netflix…', ph:'เช่น Facebook, LINE', f:[{l:'ชื่อผู้ใช้/อีเมล'},{l:'รหัสผ่าน',s:1}], gen:1, url:1, b:1, h:1 },
+  game: { n:'เกม', sec:'pw', ic:'game', c:'#f59f00', d:'Steam, Roblox, Garena…', ph:'เช่น Steam, Roblox', f:[{l:'ชื่อผู้ใช้/อีเมล'},{l:'รหัสผ่าน',s:1},{l:'ไอดีผู้เล่น (UID)'}], gen:1, url:1, b:1, h:1 },
+  mail: { n:'อีเมล', sec:'pw', ic:'mail', c:'#ef4444', d:'Gmail, Outlook, อีเมลงาน', ph:'เช่น Gmail, อีเมลงาน', f:[{l:'อีเมล'},{l:'รหัสผ่าน',s:1},{l:'อีเมลสำรอง / เบอร์กู้คืน'}], gen:1, url:1, b:1, h:1 },
+  bank: { n:'ธนาคาร & เงิน', sec:'pw', ic:'bank', c:'#12b886', d:'แอปธนาคาร, e-wallet, คริปโต', ph:'เช่น KBank, TrueMoney', f:[{l:'ชื่อผู้ใช้ / เลขบัญชี'},{l:'รหัสผ่าน',s:1},{l:'PIN',s:1}], url:1, b:1, h:1 },
+  card: { n:'บัตรเครดิต / เดบิต', sec:'pw', ic:'card', c:'#4c6ef5', d:'เลขบัตร, วันหมดอายุ, CVV', ph:'เช่น บัตร KBank', f:[{l:'ชื่อบนบัตร'},{l:'เลขบัตร',s:1},{l:'หมดอายุ'},{l:'CVV',s:1}] },
+  wifi: { n:'Wi-Fi', sec:'pw', ic:'wifi', c:'#15aabf', d:'บ้าน, ที่ทำงาน, ร้านกาแฟ', ph:'เช่น Wi-Fi บ้าน', f:[{l:'ชื่อเครือข่าย'},{l:'รหัสผ่าน',s:1}], gen:1, h:1 },
+  key:  { n:'คีย์ & โค้ด', sec:'pw', ic:'code', c:'#be4bdb', d:'API key, license, Windows key', ph:'เช่น OpenAI API', f:[{l:'คีย์ / โทเคน',s:1,m:1}], url:1, b:1 },
+  note: { n:'โน้ตลับ', sec:'pw', ic:'note', c:'#fd7e14', d:'ข้อความที่ไม่อยากให้ใครเห็น', ph:'หัวข้อโน้ต', f:[{l:'โน้ต',s:1,m:1}] },
+  photo:{ n:'รูปภาพ', sec:'media', ic:'image', c:'#f06595', d:'สลิป, QR, ภาพหน้าจอ', ph:'เช่น สลิปโอนเงิน', f:[{l:'โน้ต',m:1}] },
+  doc:  { n:'เอกสารสำคัญ', sec:'media', ic:'idcard', c:'#40c057', d:'บัตรประชาชน, พาสปอร์ต, ใบขับขี่', ph:'เช่น บัตรประชาชน', f:[{l:'เลขที่เอกสาร',s:1},{l:'วันหมดอายุ'},{l:'โน้ต',m:1}] },
 };
-const SUGGEST = [
-  ['Google','G','#4285f4','login','google.com'],['Facebook','f','#1877f2','login','facebook.com'],['Instagram','📷','#d6249f','login','instagram.com'],
-  ['X (Twitter)','𝕏','#111827','login','x.com'],['TikTok','♪','#111827','login','tiktok.com'],['LINE','💬','#06c755','login','line.me'],
-  ['Discord','🎧','#5865f2','login','discord.com'],['YouTube','▶','#ff0033','login','youtube.com'],['Netflix','N','#e50914','login','netflix.com'],
-  ['GitHub','🐙','#24292f','login','github.com'],['Microsoft','⊞','#0078d4','login','microsoft.com'],['Apple','','#555','login','apple.com'],
-  ['Shopee','🛍️','#ee4d2d','login','shopee.co.th'],['Lazada','🛒','#0f146d','login','lazada.co.th'],['Steam','🎮','#1b2838','game','steampowered.com'],
-  ['Epic Games','🕹️','#2a2a2a','game','epicgames.com'],['Garena','🔥','#e8590c','game','garena.com'],['Roblox','🧱','#e2231a','game','roblox.com'],
-  ['Binance','🪙','#f0b90b','login','binance.com'],['KBank','🏦','#138f2d','login','kasikornbank.com'],['SCB','🏦','#4e2e7f','login','scb.co.th'],['PayPal','💰','#003087','login','paypal.com'],
-];
+const kindOf = e => KINDS[e.k] || KINDS.login;
+// หัวข้อแนะนำ [ชื่อ, ตัวอักษร/อีโมจิ, สี, เว็บ]
+const SUG = {
+  login:[['Google','G','#4285f4','google.com'],['Facebook','f','#1877f2','facebook.com'],['Instagram','📷','#d6249f','instagram.com'],['X (Twitter)','𝕏','#111827','x.com'],['TikTok','♪','#111827','tiktok.com'],['LINE','💬','#06c755','line.me'],['Telegram','✈️','#229ed9','telegram.org'],['WhatsApp','📞','#25d366','whatsapp.com'],['Discord','🎧','#5865f2','discord.com'],['YouTube','▶','#ff0033','youtube.com'],['Netflix','N','#e50914','netflix.com'],['Spotify','🎵','#1db954','spotify.com'],['Disney+','D','#113ccf','disneyplus.com'],['Twitch','T','#9146ff','twitch.tv'],['Snapchat','👻','#e6b800','snapchat.com'],['Pinterest','📌','#e60023','pinterest.com'],['LinkedIn','in','#0a66c2','linkedin.com'],['Reddit','👽','#ff4500','reddit.com'],['GitHub','🐙','#24292f','github.com'],['Microsoft','⊞','#0078d4','microsoft.com'],['Apple','','#555','apple.com'],['iCloud','☁️','#3693f3','icloud.com'],['Dropbox','📦','#0061ff','dropbox.com'],['Amazon','a','#ff9900','amazon.com'],['Shopee','🛍️','#ee4d2d','shopee.co.th'],['Lazada','🛒','#0f146d','lazada.co.th'],['Grab','🚗','#00b14f','grab.com'],['LINE MAN','🛵','#06c755','lineman.line.me'],['ChatGPT','🤖','#10a37f','chatgpt.com'],['Claude','✳','#d97757','claude.ai'],['Notion','N','#222','notion.so'],['Figma','F','#a259ff','figma.com'],['Canva','C','#00c4cc','canva.com'],['Adobe','A','#fa0f00','adobe.com'],['Zoom','Z','#2d8cff','zoom.us'],['Slack','#','#4a154b','slack.com']],
+  game:[['Steam','🎮','#1b2838','steampowered.com'],['Epic Games','🕹️','#2a2a2a','epicgames.com'],['Garena','🔥','#e8590c','garena.com'],['Roblox','🧱','#e2231a','roblox.com'],['Riot Games','R','#d13639','riotgames.com'],['Valorant','V','#fa4454','playvalorant.com'],['Minecraft','⛏️','#62b47a','minecraft.net'],['PlayStation','🎮','#003791','playstation.com'],['Xbox','✕','#107c10','xbox.com'],['Nintendo','🍄','#e60012','nintendo.com'],['Genshin Impact','✨','#3b6fd1','hoyoverse.com'],['Free Fire','🔥','#f59f00','ff.garena.com'],['ROV','⚔️','#1f6feb','rov.in.th'],['PUBG','🪖','#d99100','pubg.com'],['Mobile Legends','⚔️','#c9302c','mobilelegends.com'],['EA App','EA','#ff4747','ea.com'],['Ubisoft','U','#0070ff','ubisoft.com'],['Battle.net','❄️','#148eff','battle.net'],['Fortnite','🛡️','#7d3cff','fortnite.com'],['Pokémon GO','⚪','#ee1515','pokemongo.com']],
+  mail:[['Gmail','✉️','#ea4335','mail.google.com'],['Outlook','📧','#0078d4','outlook.com'],['Yahoo Mail','Y','#6001d2','mail.yahoo.com'],['iCloud Mail','☁️','#3693f3','icloud.com'],['Proton Mail','🛡️','#6d4aff','proton.me'],['อีเมลงาน','🏢','#4c6ef5',''],['อีเมลมหาวิทยาลัย','🎓','#12b886','']],
+  bank:[['KBank','🏦','#138f2d','kasikornbank.com'],['SCB','🏦','#4e2e7f','scb.co.th'],['Krungthai','🏦','#00a6e6','krungthai.com'],['Bangkok Bank','🏦','#1e4598','bangkokbank.com'],['Krungsri','🏦','#d4a017','krungsri.com'],['ttb','🏦','#ff6a13','ttbbank.com'],['ออมสิน GSB','🏦','#eb198d','gsb.or.th'],['TrueMoney','💳','#f58220','truemoney.com'],['PromptPay','💸','#1a3c8c',''],['PayPal','💰','#003087','paypal.com'],['Wise','💸','#37a864','wise.com'],['Binance','🪙','#f0b90b','binance.com'],['Bitkub','🪙','#1ac47d','bitkub.com']],
+  card:[['บัตรเครดิต','💳','#4c6ef5'],['บัตรเดบิต','💳','#12b886'],['Visa','V','#1a1f71'],['Mastercard','M','#eb001b'],['JCB','J','#0b4ea2']],
+  wifi:[['Wi-Fi บ้าน','🏠','#4c6ef5'],['Wi-Fi ที่ทำงาน','🏢','#15aabf'],['Wi-Fi คอนโด','🏙️','#7c5cff'],['ร้านกาแฟ','☕','#fd7e14'],['ฮอตสปอตมือถือ','📱','#12b886']],
+  key:[['OpenAI API','🤖','#10a37f','platform.openai.com'],['GitHub Token','🐙','#24292f','github.com'],['Windows Key','⊞','#0078d4',''],['Microsoft 365','⊞','#d83b01',''],['Adobe','A','#fa0f00','adobe.com'],['Supabase','⚡','#3ecf8e','supabase.com'],['SSH Key','🔑','#be4bdb',''],['โดเมน / โฮสติ้ง','🌐','#4c6ef5','']],
+  note:[['รหัสสำรอง (Backup codes)','🧾','#fd7e14'],['Recovery phrase','🌱','#12b886'],['ข้อมูลส่วนตัว','👤','#7c5cff'],['ความลับอื่น ๆ','🔒','#555']],
+  photo:[['สลิปโอนเงิน','🧾','#f06595'],['QR Code','▦','#555'],['ภาพหน้าจอ','🖥️','#4c6ef5'],['ใบเสร็จ','🧾','#fd7e14'],['รูปถ่าย','📷','#12b886'],['ลายเซ็น','✍️','#7c5cff']],
+  doc:[['บัตรประชาชน','🪪','#40c057'],['พาสปอร์ต','🛂','#4c6ef5'],['ใบขับขี่','🚗','#fd7e14'],['ทะเบียนบ้าน','🏠','#12b886'],['บัตรประกันสุขภาพ','🏥','#ef4444'],['สมุดบัญชี','📘','#4c6ef5'],['ใบรับรอง','📜','#f59f00'],['สัญญา','📑','#7c5cff']],
+};
+const BRANDS = Object.entries(KINDS).filter(([,v]) => v.b).flatMap(([k]) => SUG[k].map(s => ({ n:s[0], g:s[1], c:s[2] })));
+const DEFAULT_CATS = ['ส่วนตัว','งาน','การเงิน','ครอบครัว','โซเชียล','เกม','ช้อปปิ้ง'];
+const EMOJIS = ['🔐','🔑','🗝️','🛡️','💳','🏦','💰','📶','🏠','🏢','🎓','🛒','🛍️','🎮','🕹️','🎬','🎵','📺','📷','✈️','🚗','🏥','📱','💻','🖥️','☁️','📧','💬','📞','🌐','🧾','📄','📘','🪪','🛂','🔒','⭐','❤️','🔥','⚡','🧩','🐱','🐶','🌈','🍔','☕','⚽','🎧'];
 const PALETTE = ['#7c5cff','#22b8cf','#f06595','#fd7e14','#40c057','#4c6ef5','#e64980','#15aabf','#be4bdb','#f59f00','#12b886','#fa5252'];
 function look(e){
-  const key = e.t.toLowerCase();
-  const s = SUGGEST.find(x => { const nm = x[0].toLowerCase().split(' ')[0]; return nm.length < 3 ? (key === nm || key === 'twitter') : key.includes(nm); });
-  if (s) return { bg:s[2], ch:s[1] || e.t[0].toUpperCase() };
-  let h = 0; for (const c of e.t) h = (h*31 + c.codePointAt(0)) >>> 0;
-  return { bg: PALETTE[h % PALETTE.length], ch: e.k === 'login' ? (e.t[0] || '?').toUpperCase() : KINDS[e.k]?.e || '🔑' };
+  const K = kindOf(e);
+  if (e.ic) return { bg: K.c, ch: e.ic };
+  if (K.b){
+    const key = e.t.toLowerCase();
+    const s = BRANDS.find(x => { const nm = x.n.toLowerCase().split(' ')[0]; return nm.length < 3 ? (key === nm || (nm === 'x' && key === 'twitter')) : key.includes(nm); });
+    if (s) return { bg:s.c, ch:s.g || e.t[0].toUpperCase() };
+  }
+  if (e.k === 'login' || !KINDS[e.k]){ let h = 0; for (const c of e.t) h = (h*31 + c.codePointAt(0)) >>> 0; return { bg: PALETTE[h % PALETTE.length], ch: (e.t[0] || '?').toUpperCase() }; }
+  return { bg: K.c, ch: '' };
 }
-const avatar = (e, extra='') => { const a = look(e); return `<div class="av ${extra}" style="background:${a.bg}">${esc(a.ch)}</div>`; };
+function avatar(e, extra=''){
+  const K = kindOf(e);
+  if (K.sec === 'media' && e.img && e.img.length) return `<div class="av ${extra}"><img src="${e.img[0].d}" alt=""></div>`;
+  const a = look(e);
+  return `<div class="av ${extra}" style="background:${a.bg}">${a.ch ? esc(a.ch) : ico(K.ic)}</div>`;
+}
 
-const S = { keys:null, vault:null, file:null, filter:'all', group:'', q:'', mode:'unlock', pwHold:null, syncId:null, dirty:false, timer:null, pushT:null };
+const S = { keys:null, vault:null, file:null, sec:'all', kind:'', sort:lsGet('vault.sort','az'), group:'', q:'', mode:'unlock', pwHold:null, syncId:null, dirty:false, force:false, timer:null, pushT:null };
 // รับ URL ที่วางมาผิดรูปแบบได้ เช่น มี /rest/v1/ ต่อท้าย หรือไม่มี https:// -> ตัดเหลือแค่ https://xxxx.supabase.co
 const cleanUrl = v => { v = (v || '').trim(); if (!v) return ''; try { return new URL(/^https?:\/\//i.test(v) ? v : 'https://' + v).origin; } catch { return v.replace(/\/+$/,''); } };
 const cfg = { get url(){ return cleanUrl(lsGet('vault.url') ?? DEFAULT_SUPABASE_URL); }, get key(){ return (lsGet('vault.key') ?? DEFAULT_SUPABASE_KEY).replace(/\s+/g,''); } };
@@ -429,7 +528,7 @@ const emptyVault = () => ({ v:1, entries:[], del:{}, u:Date.now() });
 async function persist(){
   S.vault.u = Date.now();
   S.file = await seal(S.keys, S.vault);
-  if (!lsSet('vault.file', JSON.stringify(S.file))) toast('บันทึกในเบราว์เซอร์ไม่ได้ — โปรดส่งออกไฟล์สำรอง');
+  if (!await saveLocal(JSON.stringify(S.file))) toast('บันทึกในเบราว์เซอร์ไม่ได้ — โปรดส่งออกไฟล์สำรอง');
   S.dirty = true; lsSet('vault.dirty','1');
   schedulePush();
 }
@@ -460,36 +559,38 @@ async function remotePut(file){
 function schedulePush(){ clearTimeout(S.pushT); if (!syncOn()) { setSync('', 'ในเครื่อง'); return; } setSync('busy','รอซิงค์…'); S.pushT = setTimeout(() => sync(true), 1200); }
 let syncing = false;
 async function sync(quiet){
-  if (!syncOn() || !S.keys || syncing) return; syncing = true;
+  if (!syncOn() || !S.keys || syncing) return false; syncing = true;
   setSync('busy', 'กำลังซิงค์…');
   try{
     const remote = await remoteGet();
-    if (remote){
+    if (remote && !S.force){
       let rv;
       try { rv = await unseal(remote, remote.kdf.salt === S.file.kdf.salt ? S.keys : await keysFor(S.pwHold, remote)); }
-      catch { throw new Error('ข้อมูลบนคลาวด์ถอดรหัสไม่ได้ (รหัสหลักไม่ตรง)'); }
+      catch { throw new Error('PIN บนฐานข้อมูลถูกเปลี่ยนจากเครื่องอื่น — ล็อกแล้วใส่ PIN ใหม่ (ระบบจะดึงข้อมูลล่าสุดให้)'); }
       const merged = mergeVaults(S.vault, rv);
       const changed = JSON.stringify(merged.entries.map(e=>e.id+e.u).sort()) !== JSON.stringify(S.vault.entries.map(e=>e.id+e.u).sort());
       S.vault = merged;
-      if (changed){ S.file = await seal(S.keys, S.vault); lsSet('vault.file', JSON.stringify(S.file)); render(); }
+      if (changed){ S.file = await seal(S.keys, S.vault); await saveLocal(JSON.stringify(S.file)); render(); }
     }
-    await remotePut(S.file);
+    await remotePut(S.file); S.force = false;
     S.dirty = false; lsDel('vault.dirty'); lsSet('vault.synced', String(Date.now()));
     setSync('ok', 'ซิงค์แล้ว'); if (!quiet) toast('ซิงค์เรียบร้อย');
+    return true;
   } catch(e){
     setSync('err', navigator.onLine ? 'ซิงค์ผิดพลาด' : 'ออฟไลน์');
     if (!quiet) toast('ซิงค์ไม่สำเร็จ: ' + e.message, 5000);
+    return false;
   } finally { syncing = false; }
 }
 window.addEventListener('online', () => { if (S.dirty) sync(true); });
 
-function ensureSyncId_(){}
-async function ensureSyncId(){ if (S.pwHold && cfg.url && cfg.key) S.syncId = await vaultId(S.pwHold); else S.syncId = null; }
+async function ensureSyncId(){ S.syncId = (cfg.url && cfg.key) ? VAULT_ID : null; }
 
 /* ============================ UI utils ============================ */
-function toast(msg, ms=2400){
+function toast(msg, ms=2400, act){
   const t = document.createElement('div'); t.className = 'toast';
   t.innerHTML = `<svg class="i" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>${esc(msg)}</span>`;
+  if (act){ const b = document.createElement('button'); b.className = 'act'; b.textContent = act.label; b.onclick = () => { b.disabled = true; act.fn(); t.remove(); }; t.append(b); t.style.pointerEvents = 'auto'; }
   $('#toasts').append(t);
   setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, ms);
 }
@@ -559,50 +660,69 @@ function primary(e){
 }
 function visible(){
   const q = S.q.trim().toLowerCase();
-  return S.vault.entries.filter(e => {
-    if (S.filter === 'fav' ? !e.fav : (S.filter !== 'all' && e.k !== S.filter)) return false;
+  const list = S.vault.entries.filter(e => {
+    const K = kindOf(e);
+    if (S.sec === 'fav' && !e.fav) return false;
+    if ((S.sec === 'pw' || S.sec === 'media') && K.sec !== S.sec) return false;
+    if (S.kind && e.k !== S.kind) return false;
     if (S.group && e.g !== S.group) return false;
     if (!q) return true;
-    return [e.t, e.g, e.url, ...e.f.filter(x => !x.s).map(x => x.v)].join('\n').toLowerCase().includes(q);
-  }).sort((a,b) => (b.fav||0)-(a.fav||0) || a.t.localeCompare(b.t, 'th'));
+    return [e.t, e.g, e.url, K.n, ...e.f.filter(x => !x.s).map(x => x.v), ...(e.img||[]).map(m => m.n)].join('\n').toLowerCase().includes(q);
+  });
+  return list.sort((a,b) => (b.fav||0)-(a.fav||0) || (S.sort === 'new' ? (b.u - a.u) : a.t.localeCompare(b.t, 'th')));
+}
+function healthData(){
+  const seen = {}, weak = [], old = [], now = Date.now();
+  for (const e of S.vault.entries){
+    if (!kindOf(e).h) continue;
+    const p = e.f.find(x => x.s && x.v); if (!p) continue;
+    (seen[p.v] ||= []).push(e);
+    if (strength(p.v).bits < 50) weak.push(e);
+    if (now - e.u > 180*86400000) old.push(e);
+  }
+  const reused = Object.values(seen).filter(a => a.length > 1);
+  const bad = new Set([...weak.map(e => e.id), ...reused.flat().map(e => e.id)]);
+  return { reused, weak, old, bad };
 }
 function render(){
   if (!S.vault) return;
-  const all = S.vault.entries;
-  $('#stats').innerHTML = [['ทั้งหมด', all.length], ['รายการโปรด', all.filter(e=>e.fav).length], ['รหัสซ้ำ/อ่อน', healthCount()]]
-    .map(([l,n],i) => `<div class="stat" style="animation-delay:${i*70}ms"><b>${n}</b><span>${l}</span></div>`).join('');
-  const kinds = [['all','ทั้งหมด','📚'],['fav','โปรด','⭐'], ...Object.entries(KINDS).map(([k,v]) => [k, v.n, v.e])];
-  $('#filters').innerHTML = kinds.map(([k,n,e]) => {
-    const c = k==='all' ? all.length : k==='fav' ? all.filter(x=>x.fav).length : all.filter(x=>x.k===k).length;
-    return (c || k==='all' || k==='fav') ? `<button class="chip ${S.filter===k?'on':''}" data-f="${k}">${e} ${n} <small>${c}</small></button>` : '';
-  }).join('');
+  const all = S.vault.entries, nOf = f => all.filter(f).length;
+  const bad = healthData().bad.size;
+  $('#stats').innerHTML = bad ? `<button class="alert" type="button">${ico('alert')}<span>มี <b>${bad}</b> รายการที่รหัสซ้ำหรืออ่อน — แตะเพื่อตรวจสอบ</span></button>` : '';
+  $('#seg').innerHTML = [['all','ทั้งหมด','grid',all.length],['pw','รหัส','key',nOf(e => kindOf(e).sec === 'pw')],['media','รูป / เอกสาร','image',nOf(e => kindOf(e).sec === 'media')],['fav','โปรด','star',nOf(e => e.fav)]]
+    .map(([k,l,ic,n]) => `<button class="${S.sec===k?'on':''}" data-sec="${k}">${ico(ic)}<span>${l}</span><small>${n}</small></button>`).join('');
+  const kl = Object.entries(KINDS).filter(([k,v]) => (S.sec === 'all' || S.sec === 'fav' || v.sec === S.sec) && nOf(e => e.k === k) > 0);
+  $('#filters').innerHTML = kl.length > 1 ? kl.map(([k,v]) => `<button class="chip ${S.kind===k?'on':''}" data-k="${k}">${ico(v.ic)} ${esc(v.n)} <small>${nOf(e => e.k === k)}</small></button>`).join('') : '';
   const groups = [...new Set(all.map(e => e.g).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th'));
-  $('#groups').innerHTML = groups.length ? groups.map(g => `<button class="chip ${S.group===g?'on':''}" data-g="${esc(g)}">#${esc(g)}</button>`).join('') : '';
+  $('#groups').innerHTML = groups.length ? `<span class="row-label">${ico('folder')} หมวดหมู่</span>` + groups.map(g => `<button class="chip ${S.group===g?'on':''}" data-g="${esc(g)}">${esc(g)}</button>`).join('') : '';
   const list = visible();
-  $('#empty').querySelector('b').textContent = all.length ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีรายการ';
+  const none = !all.length;
+  $('#empty').querySelector('b').textContent = none ? 'ยังไม่มีรายการ' : 'ไม่พบรายการที่ค้นหา';
+  $('#emptyP').textContent = none ? 'เริ่มจากเพิ่มรหัสผ่าน หรือเก็บรูป / เอกสารสำคัญไว้ในนี้' : 'ลองเปลี่ยนคำค้นหา หรือกดตัวกรองที่เลือกไว้เพื่อยกเลิก';
+  $('#emptyAct').classList.toggle('hidden', !none);
   $('#empty').classList.toggle('hidden', list.length > 0);
+  $('#lcount').textContent = `${list.length} รายการ`;
+  $('#sortBtn').innerHTML = ico('sort') + (S.sort === 'new' ? 'ล่าสุดก่อน' : 'เรียง ก–ฮ');
   const grp = new Map(); list.forEach(e => { const k = e.t.trim().toLowerCase(); if (!grp.has(k)) grp.set(k, []); grp.get(k).push(e); });
   $('#grid').innerHTML = [...grp.entries()].map(([gk, items], i) => {
-    const e = items[0];
-    if (items.length > 1) return `<div class="card" role="button" tabindex="0" data-grp="${esc(gk)}" style="--i:${Math.min(i,14)}">${avatar(e)}<div class="meta"><b>${esc(e.t)}</b><span>${items.length} บัญชี · กดเพื่อดูทั้งหมด</span></div><div class="qa"><span class="chip on">${items.length}</span></div></div>`;
-    const { user, pass } = primary(e);
-    return `<div class="card" role="button" tabindex="0" data-id="${e.id}" style="--i:${Math.min(i,14)}">${e.fav?`<span class="star">⭐</span>`:''}${avatar(e)}
-      <div class="meta"><b>${esc(e.t)}</b><span>${esc(user ? user.v : (KINDS[e.k]?.n || ''))}</span></div>
-      <div class="qa">${user ? `<button class="icon-btn" data-copy="${e.id}:u" aria-label="คัดลอกชื่อผู้ใช้" title="คัดลอกชื่อผู้ใช้">${ico('copy')}</button>`:''}${pass ? `<button class="icon-btn" data-copy="${e.id}:p" aria-label="คัดลอกรหัส" title="คัดลอกรหัสผ่าน">${ico('lock')}</button>`:''}</div></div>`;
+    const e = items[0], K = kindOf(e);
+    if (items.length > 1) return `<div class="card" role="button" tabindex="0" data-grp="${esc(gk)}" style="--i:${Math.min(i,14)}">${avatar(e)}<div class="meta"><b>${esc(e.t)}</b><span>${items.length} รายการ · กดเพื่อดูทั้งหมด</span></div><div class="qa"><span class="chip on">${items.length}</span></div></div>`;
+    const { user, pass } = primary(e), nImg = (e.img||[]).length;
+    const sub = K.sec === 'media' ? `${nImg ? nImg + ' รูป · ' : ''}${K.n}` : (user ? user.v : K.n);
+    const qa = K.sec === 'media' ? '' : `${user ? `<button class="icon-btn" data-copy="${e.id}:u" aria-label="คัดลอกชื่อผู้ใช้" title="คัดลอกชื่อผู้ใช้">${ico('copy')}</button>`:''}${pass ? `<button class="icon-btn" data-copy="${e.id}:p" aria-label="คัดลอกรหัส" title="คัดลอกรหัสผ่าน">${ico('lock')}</button>`:''}`;
+    return `<div class="card" role="button" tabindex="0" data-id="${e.id}" style="--i:${Math.min(i,14)}">${e.fav?`<span class="star">${ico('star')}</span>`:''}${avatar(e)}
+      <div class="meta"><b>${esc(e.t)}</b><span>${K.sec !== 'media' && nImg ? '🖼️ ' : ''}${esc(sub)}</span></div><div class="qa">${qa}</div></div>`;
   }).join('');
 }
-function healthCount(){
-  const seen = {}; let n = 0;
-  for (const e of S.vault.entries) for (const f of e.f) if (f.s && f.v && e.k !== 'note' && e.k !== 'card') (seen[f.v] ||= []).push(e.id);
-  const bad = new Set();
-  for (const v in seen){ if (seen[v].length > 1) seen[v].forEach(i => bad.add(i)); if (strength(v).bits < 50) seen[v].forEach(i => bad.add(i)); }
-  return bad.size;
-}
-$('#filters').onclick = e => { const b = e.target.closest('[data-f]'); if (b){ S.filter = b.dataset.f; render(); } };
+$('#seg').onclick = e => { const b = e.target.closest('[data-sec]'); if (b){ S.sec = b.dataset.sec; S.kind = ''; render(); } };
+$('#filters').onclick = e => { const b = e.target.closest('[data-k]'); if (b){ S.kind = S.kind === b.dataset.k ? '' : b.dataset.k; render(); } };
 $('#groups').onclick = e => { const b = e.target.closest('[data-g]'); if (b){ S.group = S.group === b.dataset.g ? '' : b.dataset.g; render(); } };
+$('#stats').onclick = () => healthSheet();
+$('#sortBtn').onclick = () => { S.sort = S.sort === 'new' ? 'az' : 'new'; lsSet('vault.sort', S.sort); render(); };
+$('#empty').onclick = e => { const b = e.target.closest('[data-addk]'); if (b) openEditor(null, b.dataset.addk); };
 function groupSheet(gk){
   const items = S.vault.entries.filter(x => x.t.trim().toLowerCase() === gk); if (!items.length) return;
-  openSheet(items[0].t + ' (' + items.length + ')', items.map(x => { const u = primary(x).user; return `<div class="card" role="button" tabindex="0" data-id="${x.id}" style="margin-bottom:8px">${avatar(x)}<div class="meta"><b>${esc(u ? u.v : x.t)}</b><span>${x.g ? '#'+esc(x.g)+' · ' : ''}${(x.img||[]).length ? '🖼️ '+x.img.length+' รูป · ' : ''}${KINDS[x.k]?.n || ''}</span></div></div>`; }).join(''));
+  openSheet(items[0].t + ' (' + items.length + ')', items.map(x => { const u = primary(x).user, K = kindOf(x); return `<div class="card" role="button" tabindex="0" data-id="${x.id}" style="margin-bottom:8px">${avatar(x)}<div class="meta"><b>${esc(u ? u.v : x.t)}</b><span>${x.g ? esc(x.g)+' · ' : ''}${(x.img||[]).length ? '🖼️ '+x.img.length+' รูป · ' : ''}${esc(K.n)}</span></div></div>`; }).join(''));
   $('#sheetB').onclick = ev => { const b = ev.target.closest('[data-id]'); if (b) showDetail(b.dataset.id); };
 }
 $('#grid').onclick = e => {
@@ -615,97 +735,147 @@ $('#grid').onkeydown = e => { if (e.key === 'Enter' && e.target.classList.contai
 $('#q').oninput = e => { S.q = e.target.value; render(); };
 
 
-const MAXIMG = 1280;
-async function shrinkImage(f){ const bm = await createImageBitmap(f), k = Math.min(1, MAXIMG/Math.max(bm.width,bm.height)); const c = document.createElement('canvas'); c.width = Math.round(bm.width*k); c.height = Math.round(bm.height*k); c.getContext('2d').drawImage(bm,0,0,c.width,c.height); return c.toDataURL('image/jpeg',.8); }
+const MAXIMG = 1600, MAXN = 12;
+async function shrinkImage(f){
+  const bm = await createImageBitmap(f), k = Math.min(1, MAXIMG/Math.max(bm.width,bm.height));
+  const c = document.createElement('canvas'); c.width = Math.round(bm.width*k); c.height = Math.round(bm.height*k);
+  const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0,0,c.width,c.height); x.drawImage(bm,0,0,c.width,c.height);
+  return c.toDataURL('image/jpeg',.82);
+}
 function burst(btn){ for (let i=0;i<8;i++){ const a = i/8*6.283, n = document.createElement('span'); n.className='bs'; n.textContent='⭐'; n.style.setProperty('--x', Math.cos(a)*38+'px'); n.style.setProperty('--y', Math.sin(a)*38+'px'); btn.append(n); setTimeout(() => n.remove(), 950); } }
 function downloadImg(m){ const a = document.createElement('a'); a.href = m.d; a.download = (m.n || 'image').replace(/\.[^.]+$/,'') + '.jpg'; document.body.append(a); a.click(); a.remove(); }
+function fmtSize(n){ return n > 1048576 ? (n/1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n/1024)) + ' KB'; }
+
+/* ---- lightbox ---- */
+let LB = { list:[], i:0 };
+function lbShow(){ const m = LB.list[LB.i]; if (!m) return; $('#lbImg').src = m.d; $('#lbN').textContent = `${LB.i+1} / ${LB.list.length}` + (m.n ? ' · ' + m.n : ''); $('#lbPrev').classList.toggle('hidden', LB.list.length < 2); $('#lbNext').classList.toggle('hidden', LB.list.length < 2); }
+function openLb(list, i){ LB = { list, i }; lbShow(); $('#lb').classList.remove('hidden'); }
+function closeLb(){ $('#lb').classList.add('hidden'); $('#lbImg').removeAttribute('src'); }
+const lbGo = d => { if (LB.list.length) { LB.i = (LB.i + d + LB.list.length) % LB.list.length; lbShow(); } };
+$('#lbX').onclick = closeLb; $('#lbPrev').onclick = () => lbGo(-1); $('#lbNext').onclick = () => lbGo(1);
+$('#lbDl').onclick = () => { const m = LB.list[LB.i]; if (m){ downloadImg(m); toast('ดาวน์โหลดรูปแล้ว'); } };
+$('#lb').onclick = e => { if (e.target.id === 'lb' || e.target.id === 'lbImg') closeLb(); };
+
 /* ============================ detail ============================ */
 function colorPw(v){ return [...v].map(c => /\d/.test(c) ? `<span class="pw-c-n">${esc(c)}</span>` : /[A-Za-z]/.test(c) ? esc(c) : `<span class="pw-c-s">${esc(c)}</span>`).join(''); }
 function showDetail(id){
   const e = S.vault.entries.find(x => x.id === id); if (!e) return;
-  const rows = e.f.filter(f => f.v).map((f,i) => `<div class="drow" style="--i:${i}"><div class="dv"><small>${esc(f.l)}</small><div class="v ${f.s?'mono':''}" data-v="${i}">${f.s ? '••••••••••' : esc(f.v)}</div></div>
-    ${f.s?`<button class="icon-btn" data-eye="${i}" aria-label="แสดง/ซ่อน">${ico('eye')}</button>`:''}<button class="icon-btn" data-c="${i}" aria-label="คัดลอก">${ico('copy')}</button></div>`).join('');
+  const K = kindOf(e), media = K.sec === 'media', imgs = e.img || [];
   const shown = e.f.filter(f => f.v);
-  const imgs = (e.img||[]).length ? `<div class="imgs">${e.img.map((m,i) => `<div class="imgc"><img src="${m.d}" alt=""><button class="icon-btn" data-dl="${i}" aria-label="ดาวน์โหลดรูป">⬇️</button></div>`).join('')}</div>` : '';
-  openSheet(KINDS[e.k]?.n || 'รายการ', `<div class="dhead">${avatar(e)}<div><h3>${esc(e.t)}</h3><p>${e.g?'#'+esc(e.g)+' · ':''}อัปเดต ${new Date(e.u).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'})}</p></div></div>
-    ${rows}${imgs}${e.url?`<div class="drow"><div class="dv"><small>เว็บไซต์</small><div class="v">${esc(e.url)}</div></div><a class="icon-btn" target="_blank" rel="noopener noreferrer" href="https://${esc(e.url.replace(/^https?:\/\//,''))}" aria-label="เปิด">${ico('link')}</a></div>`:''}`,
-    `<button class="btn ghost" id="dFav">${ico('star')} ${e.fav?'เลิกโปรด':'โปรด'}</button><button class="btn ghost" id="dEdit">${ico('edit')} แก้ไข</button><button class="btn danger" id="dDel">${ico('trash')}</button>`);
+  const rows = shown.map((f,i) => `<div class="drow" style="--i:${i}"><div class="dv"><small>${esc(f.l)}</small><div class="v ${f.s?'mono':''}" data-v="${i}">${f.s ? '••••••••••' : esc(f.v)}</div></div>
+    ${f.s?`<button class="icon-btn" data-eye="${i}" aria-label="แสดง/ซ่อน">${ico('eye')}</button>`:''}<button class="icon-btn" data-c="${i}" aria-label="คัดลอก">${ico('copy')}</button></div>`).join('');
+  const gal = imgs.length ? `${media ? '' : `<div class="sec-h">${ico('image')} รูปแนบ (${imgs.length})</div>`}<div class="imgs">${imgs.map((m,i) => `<div class="imgc"><img src="${m.d}" alt="" data-open="${i}"><button class="icon-btn" data-dl="${i}" aria-label="ดาวน์โหลดรูป">${ico('down')}</button></div>`).join('')}</div>` : '';
+  const web = e.url ? `<div class="drow"><div class="dv"><small>เว็บไซต์</small><div class="v">${esc(e.url)}</div></div><a class="icon-btn" target="_blank" rel="noopener noreferrer" href="https://${esc(e.url.replace(/^https?:\/\//,''))}" aria-label="เปิด">${ico('link')}</a></div>` : '';
+  openSheet(K.n, `<div class="dhead">${avatar(e)}<div><h3>${esc(e.t)}</h3><p>${e.g ? ico('folder') + ' ' + esc(e.g) + ' · ' : ''}อัปเดต ${new Date(e.u).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'})}</p></div></div>
+    ${media ? gal + rows : rows + gal}${web}`,
+    `<button class="btn ghost" id="dFav">${ico('star')} ${e.fav?'เลิกโปรด':'โปรด'}</button><button class="btn ghost" id="dEdit">${ico('edit')} แก้ไข</button><button class="btn ghost sq" id="dDup" title="ทำสำเนา" aria-label="ทำสำเนา">${ico('copy')}</button><button class="btn danger sq" id="dDel" aria-label="ลบ">${ico('trash')}</button>`);
   const b = $('#sheetB');
   b.onclick = ev => {
-    const eye = ev.target.closest('[data-eye]'), cp = ev.target.closest('[data-c]');
+    const eye = ev.target.closest('[data-eye]'), cp = ev.target.closest('[data-c]'), op = ev.target.closest('[data-open]'), dl = ev.target.closest('[data-dl]');
     if (eye){ const i = +eye.dataset.eye, el = b.querySelector(`[data-v="${i}"]`), on = el.dataset.on !== '1'; el.dataset.on = on?'1':''; el.innerHTML = on ? colorPw(shown[i].v) : '••••••••••'; eye.innerHTML = ico(on?'eyeoff':'eye'); }
     if (cp){ const f = shown[+cp.dataset.c]; copy(f.v, f.l); }
-    const dl = ev.target.closest('[data-dl]'); if (dl){ burst(dl); downloadImg(e.img[+dl.dataset.dl]); toast('ดาวน์โหลดรูปแล้ว'); }
+    if (op) openLb(imgs, +op.dataset.open);
+    if (dl){ burst(dl); downloadImg(imgs[+dl.dataset.dl]); toast('ดาวน์โหลดรูปแล้ว'); }
   };
   $('#dFav').onclick = async () => { e.fav = e.fav ? 0 : 1; e.u = Date.now(); await persist(); render(); showDetail(id); };
   $('#dEdit').onclick = () => openEditor(e);
+  $('#dDup').onclick = () => openEditor(null, e.k, { t:e.t, g:e.g, url:e.url, ic:e.ic });
   $('#dDel').onclick = async () => {
-    if (await dialog({title:'ลบรายการนี้?', text:`“${e.t}” จะถูกลบถาวร`, ok:'ลบ', danger:true})){
-      S.vault.entries = S.vault.entries.filter(x => x.id !== id); S.vault.del[id] = Date.now();
-      await persist(); closeSheet(); render(); toast('ลบแล้ว');
-    }
+    if (!await dialog({title:'ลบรายการนี้?', text:`“${e.t}” จะถูกลบ (กดเลิกทำได้ทันทีหลังลบ)`, ok:'ลบ', danger:true})) return;
+    S.vault.entries = S.vault.entries.filter(x => x.id !== id); S.vault.del[id] = Date.now();
+    await persist(); closeSheet(); render();
+    toast('ลบแล้ว', 6000, { label:'เลิกทำ', fn: async () => { e.u = Date.now(); delete S.vault.del[id]; S.vault.entries.push(e); await persist(); render(); toast('กู้คืนแล้ว'); } });
   };
 }
 
-/* ============================ editor (เพิ่มให้เร็วที่สุด) ============================ */
-function openEditor(entry){
+/* ============================ add: เลือกประเภทก่อน แล้วค่อยกรอก ============================ */
+function addPicker(){
+  const tiles = sec => Object.entries(KINDS).filter(([,v]) => v.sec === sec).map(([k,v]) => `<button type="button" class="tile" data-k="${k}"><div class="av" style="background:${v.c}">${ico(v.ic)}</div><b>${esc(v.n)}</b><small>${esc(v.d)}</small></button>`).join('');
+  openSheet('เพิ่มอะไรดี?', `<div class="sec-h">${ico('key')} ${SECS.pw.n}</div><div class="tiles">${tiles('pw')}</div><div class="sec-h">${ico('image')} ${SECS.media.n}</div><div class="tiles">${tiles('media')}</div>`);
+  $('#sheetB').onclick = ev => { const b = ev.target.closest('[data-k]'); if (b) openEditor(null, b.dataset.k); };
+}
+
+/* ============================ editor ============================ */
+function openEditor(entry, kind, preset){
   const isNew = !entry;
-  const E = entry ? JSON.parse(JSON.stringify(entry)) : { id: uid(), k:'login', t:'', g:'', url:'', f:[], fav:0, c:Date.now(), u:Date.now() };
-  let touched = !isNew; E.img = E.img || [];
-  const imgBlock = () => `<div class="field"><span>รูปภาพ (บีบอัดอัตโนมัติ)</span></div><div class="imgs">${E.img.map((m,i) => `<div class="imgc"><img src="${m.d}" alt=""><button type="button" class="icon-btn rm" data-ri="${i}" aria-label="ลบรูป">✕</button></div>`).join('')}</div><button type="button" class="chip" id="addImg" style="margin-bottom:16px">📷 เพิ่มรูป</button>`;
-  const applyKind = k => {
-    E.k = k;
-    if (!touched){ E.f = KINDS[k].f.map(x => ({ l:x.l, v:'', s:x.s?1:0, m:x.m?1:0 })); const pw = E.f.find(x => x.s && KINDS[k].gen); if (pw) pw.v = genPassword(pref.glen); }
-  };
-  if (isNew) applyKind('login');
+  const E = entry ? JSON.parse(JSON.stringify(entry)) : { id: uid(), k: KINDS[kind] ? kind : 'login', t: preset?.t || '', g: preset?.g || '', url: preset?.url || '', ic: preset?.ic || '', f:[], img:[], fav:0, c:Date.now(), u:Date.now() };
+  E.img = E.img || [];
+  let touched = !isNew, icOpen = false, CL = [];
+  const K = () => kindOf(E);
+  const applyKind = () => { E.f = K().f.map(x => ({ l:x.l, v:'', s:x.s?1:0, m:x.m?1:0 })); const pw = E.f.find(x => x.s && K().gen); if (pw) pw.v = genPassword(pref.glen); };
+  if (isNew) applyKind();
+  const sugList = () => (SUG[E.k] || []).map((s,i) => [s,i]).filter(([s]) => !E.t || s[0].toLowerCase().includes(E.t.toLowerCase())).slice(0, 14);
+  const sugHtml = () => sugList().map(([s,i],n) => `<button type="button" data-s="${i}" style="animation-delay:${n*25}ms"><div class="av" style="background:${s[2]}">${esc(s[1] || s[0][0])}</div>${esc(s[0])}</button>`).join('');
+  const imgBlock = big => `<div class="field"><span>${big ? 'รูปภาพ' : 'แนบรูป (ไม่บังคับ)'} · ${E.img.length}/${MAXN} · บีบอัดอัตโนมัติ</span></div>
+    ${E.img.length ? `<div class="imgs">${E.img.map((m,i) => `<div class="imgc"><img src="${m.d}" alt=""><button type="button" class="icon-btn rm" data-ri="${i}" aria-label="ลบรูป">${ico('x')}</button></div>`).join('')}</div>` : ''}
+    <div class="addimg"><button type="button" class="chip ${big && !E.img.length ? 'on' : ''}" id="addImg">${ico('image')} เลือกรูป</button><button type="button" class="chip" id="camImg">${ico('camera')} ถ่ายรูป</button></div>`;
   const fieldRow = (f,i) => `<div class="frow" data-i="${i}"><div class="lab"><input value="${esc(f.l)}" data-l="${i}" aria-label="ชื่อช่อง"></div>
     <div class="val">${f.m ? `<textarea class="inp" data-v="${i}" rows="4">${esc(f.v)}</textarea>` : `<input class="inp" data-v="${i}" type="${f.s && !f._show ? 'password':'text'}" value="${esc(f.v)}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${f.s?'':'พิมพ์ที่นี่'}">`}</div>
-    ${f.s && !f.m ? `<button type="button" class="icon-btn" data-eye="${i}" aria-label="แสดง">${ico(f._show?'eyeoff':'eye')}</button>`:''}
-    ${f.s && !f.m ? `<button type="button" class="icon-btn" data-gen="${i}" aria-label="สุ่มรหัส" title="สุ่มรหัสผ่าน">${ico('dice')}</button>`:''}
+    ${f.s && !f.m ? `<button type="button" class="icon-btn" data-eye="${i}" aria-label="แสดง">${ico(f._show?'eyeoff':'eye')}</button>` : ''}
+    ${f.s && !f.m && K().gen ? `<button type="button" class="icon-btn" data-gen="${i}" aria-label="สุ่มรหัส" title="สุ่มรหัสผ่าน">${ico('dice')}</button>` : ''}
     <button type="button" class="icon-btn" data-rm="${i}" aria-label="ลบช่อง">${ico('x')}</button></div>`;
   const draw = () => {
-    const sug = SUGGEST.filter(s => !E.t || s[0].toLowerCase().includes(E.t.toLowerCase())).slice(0, 12);
-    const pw = E.f.find(x => x.s && !x.m);
+    const k = K(), media = k.sec === 'media', pw = E.f.find(x => x.s && !x.m);
+    CL = [...new Set([...DEFAULT_CATS, ...S.vault.entries.map(x => x.g).filter(Boolean), ...(E.g ? [E.g] : [])])];
+    const sg = isNew ? sugHtml() : '';
     $('#sheetB').innerHTML = `
-      ${isNew ? `<div class="kinds">${Object.entries(KINDS).map(([k,v]) => `<button type="button" class="chip ${E.k===k?'on':''}" data-k="${k}">${v.e} ${v.n}</button>`).join('')}</div>` : ''}
-      <label class="field"><span>ชื่อ (เช่น Facebook, Steam)</span><input class="inp" id="eT" value="${esc(E.t)}" autocomplete="off" placeholder="พิมพ์ชื่อบริการ…" enterkeyhint="next"></label>
-      ${isNew && sug.length && ['login','game'].includes(E.k) ? `<div class="sug" id="sug">${sug.map((s,i) => `<button type="button" data-s="${SUGGEST.indexOf(s)}" style="animation-delay:${i*25}ms"><div class="av" style="background:${s[2]}">${esc(s[1]||s[0][0])}</div>${esc(s[0])}</button>`).join('')}</div>` : ''}
+      <div class="kpill-row">${isNew ? `<button type="button" class="kpill" id="kBack">${ico(k.ic)} ${esc(k.n)} <small>เปลี่ยนประเภท</small></button>` : `<span class="kpill">${ico(k.ic)} ${esc(k.n)}</span>`}</div>
+      <label class="field"><span>ชื่อ / หัวข้อ</span><input class="inp" id="eT" value="${esc(E.t)}" autocomplete="off" placeholder="${esc(k.ph)}" enterkeyhint="next"></label>
+      ${sg ? `<div class="sug" id="sug">${sg}</div>` : '<div id="sug" class="sug hidden"></div>'}
+      ${media ? imgBlock(true) : ''}
       <div id="fields">${E.f.map(fieldRow).join('')}</div>
       ${pw ? `<div class="meter"><b id="eBar"></b></div><div class="meter-t" id="eTxt"></div>` : ''}
       <button type="button" class="chip" id="addF" style="margin-bottom:16px">${ico('plus')} เพิ่มช่อง</button>
-      <label class="field"><span>หมวด (ไม่บังคับ — ไว้จัดกลุ่ม)</span><input class="inp" id="eG" value="${esc(E.g)}" placeholder="เช่น งาน, ครอบครัว, เกมมือถือ" autocomplete="off"></label>
-      <label class="field"><span>เว็บไซต์ (ไม่บังคับ)</span><input class="inp" id="eU" value="${esc(E.url)}" placeholder="example.com" inputmode="url" autocomplete="off"></label>
-      ${imgBlock()}`;
+      ${media ? '' : imgBlock(false)}
+      <div class="field" style="margin-top:14px"><span>หมวดหมู่ (ไม่บังคับ)</span></div>
+      <div class="catpick">${CL.map((c,i) => `<button type="button" class="chip ${E.g===c?'on':''}" data-cat="${i}">${ico('folder')} ${esc(c)}</button>`).join('')}<button type="button" class="chip" id="catNew">${ico('plus')} หมวดใหม่</button></div>
+      ${k.url || E.url ? `<label class="field"><span>เว็บไซต์ (ไม่บังคับ)</span><input class="inp" id="eU" value="${esc(E.url)}" placeholder="example.com" inputmode="url" autocomplete="off"></label>` : ''}
+      <div class="field"><span>ไอคอน (ไม่บังคับ)</span></div>
+      <div class="icrow"><div class="av" style="background:${look(E).bg}">${look(E).ch ? esc(look(E).ch) : ico(k.ic)}</div><button type="button" class="chip" id="icTog">${icOpen ? 'ปิด' : 'เปลี่ยนไอคอน'}</button>${E.ic ? '<button type="button" class="chip" id="icClr">ใช้ค่าเริ่มต้น</button>' : ''}</div>
+      ${icOpen ? `<div class="emo">${EMOJIS.map((m,i) => `<button type="button" data-emo="${i}">${m}</button>`).join('')}</div>` : ''}`;
     meter();
   };
-  const meter = () => { const pw = E.f.find(x => x.s && !x.m); const bar = $('#eBar'); if (!bar || !pw) return; const s = strength(pw.v); bar.style.width = s.s + '%'; bar.style.background = sColor(s.s); $('#eTxt').textContent = pw.v ? `ความแข็งแรง: ${s.t}` : ''; };
-  openSheet(isNew ? 'เพิ่มรายการ' : 'แก้ไข', '', `<button class="btn ghost" id="eCancel">ยกเลิก</button><button class="btn primary" id="eSave">${ico('check')} บันทึก</button>`);
+  const meter = () => { const pw = E.f.find(x => x.s && !x.m); const bar = $('#eBar'); if (!bar || !pw) return; const s = strength(pw.v); bar.style.width = s.s + '%'; bar.style.background = sColor(s.s); $('#eTxt').textContent = pw.v && K().h ? `ความแข็งแรง: ${s.t}` : ''; };
+  const pickImages = cap => {
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; if (cap) inp.setAttribute('capture','environment'); else inp.multiple = true;
+    inp.onchange = async () => { let over = 0; for (const f of inp.files){ if (E.img.length >= MAXN){ over++; continue; } try { E.img.push({ n:f.name, d:await shrinkImage(f) }); } catch { toast('อ่านรูปไม่ได้: ' + f.name); } } if (over) toast(`เพิ่มได้สูงสุด ${MAXN} รูปต่อรายการ`); draw(); };
+    inp.click();
+  };
+  openSheet(isNew ? 'เพิ่ม' + K().n : 'แก้ไข', '', `<button class="btn ghost" id="eCancel">ยกเลิก</button><button class="btn primary" id="eSave">${ico('check')} บันทึก</button>`);
   draw(); if (isNew) setTimeout(() => $('#eT')?.focus(), 350);
   const B = $('#sheetB');
   B.oninput = ev => {
     const t = ev.target;
-    if (t.id === 'eT'){ E.t = t.value; const cur = t.selectionStart; const s = $('#sug'); if (isNew){ const sg = SUGGEST.filter(x => !E.t || x[0].toLowerCase().includes(E.t.toLowerCase())).slice(0,12); if (s) s.innerHTML = sg.map((x,i) => `<button type="button" data-s="${SUGGEST.indexOf(x)}"><div class="av" style="background:${x[2]}">${esc(x[1]||x[0][0])}</div>${esc(x[0])}</button>`).join(''); } }
+    if (t.id === 'eT'){ E.t = t.value; const s = $('#sug'); if (isNew && s){ const h = sugHtml(); s.innerHTML = h; s.classList.toggle('hidden', !h); } }
     else if (t.dataset.v !== undefined){ touched = true; E.f[+t.dataset.v].v = t.value; meter(); }
     else if (t.dataset.l !== undefined){ touched = true; E.f[+t.dataset.l].l = t.value; }
-    else if (t.id === 'eG') E.g = t.value; else if (t.id === 'eU') E.url = t.value;
+    else if (t.id === 'eU') E.url = t.value;
   };
-  B.onclick = ev => {
+  B.onclick = async ev => {
     const t = ev.target.closest('button'); if (!t) return;
-    if (t.dataset.k){ applyKind(t.dataset.k); draw(); return; }
-    if (t.dataset.s !== undefined){ const s = SUGGEST[+t.dataset.s]; E.t = s[0]; E.url = s[4]; if (!touched || !E.f.some(x=>x.v && !x.s)) { E.k = s[3]; if (!touched) applyKind(s[3]); } draw(); const u = B.querySelector('[data-v="0"]'); u?.focus(); return; }
+    if (t.id === 'kBack'){ addPicker(); return; }
+    if (t.dataset.s !== undefined){ const s = SUG[E.k][+t.dataset.s]; E.t = s[0]; if (s[3] !== undefined && s[3] !== '' && (K().url)) E.url = s[3]; if (!K().b) E.ic = s[1]; draw(); B.querySelector('[data-v="0"]')?.focus(); return; }
     if (t.dataset.eye !== undefined){ const f = E.f[+t.dataset.eye]; f._show = !f._show; draw(); return; }
     if (t.dataset.gen !== undefined){ touched = true; E.f[+t.dataset.gen].v = genPassword(pref.glen); E.f[+t.dataset.gen]._show = true; draw(); return; }
     if (t.dataset.rm !== undefined){ touched = true; E.f.splice(+t.dataset.rm, 1); draw(); return; }
-    if (t.dataset.ri !== undefined){ E.img.splice(+t.dataset.ri,1); draw(); return; }
-    if (t.id === 'addImg'){ const inp = document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.multiple=true; inp.onchange = async () => { for (const f of inp.files){ try { E.img.push({ n:f.name, d:await shrinkImage(f) }); } catch { toast('อ่านรูปไม่ได้: '+f.name); } } draw(); }; inp.click(); return; }
+    if (t.dataset.ri !== undefined){ E.img.splice(+t.dataset.ri, 1); draw(); return; }
+    if (t.dataset.cat !== undefined){ const c = CL[+t.dataset.cat]; E.g = E.g === c ? '' : c; draw(); return; }
+    if (t.dataset.emo !== undefined){ E.ic = EMOJIS[+t.dataset.emo]; icOpen = false; draw(); return; }
+    if (t.id === 'catNew'){ const v = await dialog({ title:'หมวดหมู่ใหม่', input:'เช่น งานฟรีแลนซ์', ok:'ตกลง' }); if (v && v.trim()){ E.g = v.trim(); draw(); } return; }
+    if (t.id === 'icTog'){ icOpen = !icOpen; draw(); return; }
+    if (t.id === 'icClr'){ E.ic = ''; draw(); return; }
+    if (t.id === 'addImg'){ pickImages(false); return; }
+    if (t.id === 'camImg'){ pickImages(true); return; }
     if (t.id === 'addF'){ touched = true; E.f.push({ l:'ช่องใหม่', v:'', s:0 }); draw(); const ins = B.querySelectorAll('[data-l]'); ins[ins.length-1]?.select(); }
   };
-  B.onkeydown = ev => { if (ev.key === 'Enter' && ev.target.tagName === 'INPUT' && ev.target.id !== 'eG'){ ev.preventDefault(); save(); } };
+  B.onkeydown = ev => { if (ev.key === 'Enter' && ev.target.tagName === 'INPUT' && !ev.target.dataset.l){ ev.preventDefault(); save(); } };
   $('#eCancel').onclick = closeSheet;
   const save = async () => {
     if (!E.t.trim()){ toast('ใส่ชื่อก่อนนะ'); $('#eT').focus(); return; }
     E.t = E.t.trim(); E.g = (E.g||'').trim(); E.url = (E.url||'').trim(); E.u = Date.now();
     E.f = E.f.filter(x => x.v || x.l).map(x => ({ l:x.l, v:x.v, s:x.s?1:0, ...(x.m?{m:1}:{}) }));
+    if (K().sec === 'media' && !E.img.length && !E.f.some(x => x.v)){ toast('เพิ่มรูปอย่างน้อย 1 รูปก่อนนะ'); return; }
+    if (!E.ic) delete E.ic;
     const i = S.vault.entries.findIndex(x => x.id === E.id);
     if (i >= 0) S.vault.entries[i] = E; else S.vault.entries.push(E);
     delete S.vault.del[E.id];
@@ -713,7 +883,8 @@ function openEditor(entry){
   };
   $('#eSave').onclick = save;
 }
-$('#fab').onclick = () => openEditor();
+$('#fab').onclick = addPicker;
+
 
 /* ============================ import / export ============================ */
 function parseCsv(t){
@@ -774,19 +945,19 @@ async function importBackupFlow(){
   const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.vault,.json';
   inp.onchange = async () => {
     const f = inp.files[0]; if (!f) return; const text = await readFileText(f);
-    const pw = await dialog({ title:'PINของไฟล์นี้', text:'ใส่PINที่ใช้ตอนสร้างไฟล์สำรอง (ถ้าเหมือนกับตอนนี้ก็ใส่อันเดียวกัน)', input:'PIN', type:'password', ok:'นำเข้า' });
+    const pw = await dialog({ title:'PIN ของไฟล์นี้', text:'ใส่ PIN ที่ใช้ตอนสร้างไฟล์สำรอง (ถ้าเหมือนกับตอนนี้ก็ใส่อันเดียวกัน)', input:'PIN', type:'password', ok:'นำเข้า' });
     if (!pw) return;
     try{
       const r = await openAnyBackup(text, pw); let added = 0, extra = '';
       if (r.vault){ const before = S.vault.entries.length; S.vault = mergeVaults(S.vault, r.vault); added = S.vault.entries.length - before; }
       else { added = addParsed(r.legacy.entries.map(e => ({ t:e.t, user:e.f.find(x=>!x.s&&x.l!=='โน้ต')?.v||'', pass:e.f.find(x=>x.s)?.v||'', url:'', note:e.f.find(x=>x.l==='โน้ต')?.v||'' }))); if (r.legacy.skippedFiles) extra = ` (ข้ามไฟล์แนบ ${r.legacy.skippedFiles} รายการ)`; }
       await persist(); closeSheet(); render(); toast(`นำเข้าแล้ว ${added} รายการ${extra}`, 4500);
-    } catch(e){ toast(e.message === 'bad-password' ? 'PINไม่ถูกต้อง' : e.message); }
+    } catch(e){ toast(e.message === 'bad-password' ? 'PIN ไม่ถูกต้อง' : e.message); }
   };
   inp.click();
 }
 function bulkImportSheet(){
-  openSheet('วางหลายบัญชีพร้อมกัน', `<p style="color:var(--muted);margin:0 0 10px;font-size:13.5px">1 บรรทัด = 1 บัญชี รูปแบบ <b>ชื่อ ผู้ใช้ รหัสผ่าน</b> (คั่นด้วยเว้นวรรค / Tab / จุลภาค / |)<br>หรือวางไฟล์ CSV ที่ส่งออกจาก Chrome / Bitwarden ได้เลย</p>
+  openSheet('วางข้อความ / CSV', `<p style="color:var(--muted);margin:0 0 10px;font-size:13.5px">1 บรรทัด = 1 บัญชี รูปแบบ <b>ชื่อ ผู้ใช้ รหัสผ่าน</b> (คั่นด้วยเว้นวรรค / Tab / จุลภาค / |)<br>หรือวางไฟล์ CSV ที่ส่งออกจาก Chrome / Bitwarden ได้เลย</p>
     <textarea class="inp" id="bulk" rows="9" placeholder="Facebook me@mail.com P@ssw0rd\nSteam myname abc12345" spellcheck="false"></textarea><div class="meter-t" id="bulkN" style="margin-top:8px"></div>`,
     `<button class="btn ghost" id="bCancel">ยกเลิก</button><button class="btn primary" id="bGo">นำเข้า</button>`);
   $('#bulk').oninput = e => { const n = parseBulk(e.target.value).length; $('#bulkN').textContent = n ? `พบ ${n} รายการ` : ''; };
@@ -807,15 +978,7 @@ function generatorSheet(){
   $('#gRe').onclick = go; $('#gCp').onclick = () => copy(cur, 'รหัสผ่าน'); go();
 }
 function healthSheet(){
-  const seen = {}, weak = [], old = [];
-  const now = Date.now();
-  for (const e of S.vault.entries){
-    const p = e.f.find(x => x.s && x.v); if (!p || e.k === 'note' || e.k === 'card') continue;
-    (seen[p.v] ||= []).push(e);
-    if (strength(p.v).bits < 50) weak.push(e);
-    if (now - e.u > 180*86400000) old.push(e);
-  }
-  const reused = Object.values(seen).filter(a => a.length > 1);
+  const { reused, weak, old } = healthData();
   const list = (arr) => arr.map(e => `<button class="chip" data-id="${e.id}">${esc(e.t)}</button>`).join(' ') || '<small style="color:var(--ok)">ไม่มี 👍</small>';
   openSheet('ตรวจสุขภาพรหัสผ่าน', `<div class="health">
     <div class="hitem">🔁 <div><b style="margin:0">ใช้รหัสซ้ำกัน</b><div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px">${reused.length ? reused.map(g => list(g)).join('<br>') : list([])}</div></div></div>
@@ -823,24 +986,37 @@ function healthSheet(){
     <div class="hitem">🕰️ <div><b style="margin:0">ไม่ได้เปลี่ยนเกิน 6 เดือน</b><div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px">${list(old)}</div></div></div></div>`);
   $('#sheetB').onclick = e => { const b = e.target.closest('[data-id]'); if (b) showDetail(b.dataset.id); };
 }
+function catSheet(){
+  const m = new Map(); S.vault.entries.forEach(e => { if (e.g) m.set(e.g, (m.get(e.g)||0) + 1); });
+  const rows = [...m].sort((a,b) => a[0].localeCompare(b[0],'th'));
+  openSheet('จัดการหมวดหมู่', rows.length ? rows.map(([g,n],i) => `<div class="drow"><div class="dv"><div class="v">${ico('folder')} ${esc(g)}</div><small>${n} รายการ</small></div><button class="icon-btn" data-re="${i}" aria-label="เปลี่ยนชื่อ">${ico('edit')}</button><button class="icon-btn" data-rd="${i}" aria-label="ลบหมวด">${ico('trash')}</button></div>`).join('') : '<p class="set-info">ยังไม่มีหมวดหมู่ — เลือกหมวดตอนเพิ่มหรือแก้ไขรายการ</p>');
+  $('#sheetB').onclick = async ev => {
+    const re = ev.target.closest('[data-re]'), rd = ev.target.closest('[data-rd]'); const now = Date.now();
+    if (re){ const old = rows[+re.dataset.re][0]; const nv = await dialog({ title:'เปลี่ยนชื่อหมวด', text:`“${old}”`, input:'ชื่อใหม่', ok:'บันทึก' }); if (!nv || !nv.trim()) return;
+      S.vault.entries.forEach(e => { if (e.g === old){ e.g = nv.trim(); e.u = now; } }); if (S.group === old) S.group = nv.trim(); await persist(); render(); catSheet(); }
+    if (rd){ const old = rows[+rd.dataset.rd][0]; if (!await dialog({ title:'ลบหมวดนี้?', text:`รายการใน “${old}” จะไม่ถูกลบ แค่ไม่มีหมวด`, ok:'ลบหมวด', danger:true })) return;
+      S.vault.entries.forEach(e => { if (e.g === old){ e.g = ''; e.u = now; } }); if (S.group === old) S.group = ''; await persist(); render(); catSheet(); }
+  };
+}
 function settingsSheet(){
   const last = +lsGet('vault.backup','0');
+  const nImg = S.vault.entries.reduce((n,e) => n + (e.img||[]).length, 0), size = JSON.stringify(S.file || {}).length;
   openSheet('ตั้งค่า', `
-    <div class="set-sec"><h4>เครื่องมือ</h4><div class="set-row"><button class="btn ghost" id="sGen">${ico('dice')} สุ่มรหัสผ่าน</button><button class="btn ghost" id="sHealth">${ico('shield')} ตรวจสุขภาพรหัส</button></div></div>
-    <div class="set-sec"><h4>สำรอง / ย้ายข้อมูล</h4><div class="set-row"><button class="btn primary" id="sExp">${ico('down')} ส่งออกไฟล์เข้ารหัส</button><button class="btn ghost" id="sImp">${ico('up')} นำเข้าไฟล์</button><button class="btn ghost" id="sBulk">${ico('list')} วางหลายบัญชี</button></div>
-      <p style="color:var(--muted);font-size:12.5px;margin:8px 0 0">ไฟล์ .vault ใช้ได้กับ Vault CMD (VaultCMD/Vault.bat) · สำรองล่าสุด: ${last ? new Date(last).toLocaleDateString('th-TH') : 'ยังไม่เคย'}</p></div>
-    <div class="set-sec"><h4>ฐานข้อมูล (Supabase)</h4><p style="color:var(--muted);font-size:13px;margin:0 0 10px">${cfg.url ? 'เชื่อมอยู่กับ ' + esc(cfg.url.replace(/^https?:\/\//,'')) : 'ยังไม่ได้เชื่อม — ข้อมูลอยู่ในเครื่องนี้เท่านั้น'}</p><div class="set-row"><button class="btn ghost" id="sDb">${ico('cloud')} ${cfg.url ? 'ย้าย / เปลี่ยนฐานข้อมูล' : 'เชื่อมฐานข้อมูล'}</button>${cfg.url ? '<button class="btn ghost" id="sDbOff">ตัดการเชื่อมต่อ</button>' : ''}</div></div>
+    <div class="set-sec"><h4>เครื่องมือ</h4><div class="set-row"><button class="btn ghost" id="sGen">${ico('dice')} สุ่มรหัสผ่าน</button><button class="btn ghost" id="sHealth">${ico('shield')} ตรวจสุขภาพรหัส</button><button class="btn ghost" id="sCats">${ico('folder')} จัดการหมวดหมู่</button></div></div>
+    <div class="set-sec"><h4>ข้อมูลของคุณ</h4><p class="set-info">${S.vault.entries.length} รายการ · ${nImg} รูป · ขนาดรวม ${fmtSize(size)}${size > 6*1048576 ? '<br>⚠️ ข้อมูลเริ่มใหญ่ ซิงค์อาจช้า — ลองลบรูปที่ไม่ใช้แล้ว' : ''}</p></div>
+    <div class="set-sec"><h4>สำรอง / นำเข้า</h4><div class="set-row"><button class="btn primary" id="sExp">${ico('down')} ส่งออกไฟล์สำรอง (.vault)</button><button class="btn ghost" id="sImp">${ico('up')} นำเข้าไฟล์สำรอง</button><button class="btn ghost" id="sBulk">${ico('list')} วางข้อความ / CSV</button></div>
+      <p class="set-info" style="margin-top:8px">ไฟล์ .vault อ่านได้ด้วย Vault CMD (VaultCMD/Vault.bat) · สำรองล่าสุด: ${last ? new Date(last).toLocaleDateString('th-TH') : 'ยังไม่เคย'}</p></div>
+    <div class="set-sec"><h4>ฐานข้อมูล (Supabase)</h4><p class="set-info">${cfg.url ? 'เชื่อมอยู่กับ ' + esc(cfg.url.replace(/^https?:\/\//,'')) : 'ยังไม่ได้เชื่อม — ข้อมูลอยู่ในเครื่องนี้เท่านั้น'}</p><div class="set-row"><button class="btn ghost" id="sDb">${ico('cloud')} ${cfg.url ? 'ย้าย / เปลี่ยนฐานข้อมูล' : 'เชื่อมฐานข้อมูล'}</button>${cfg.url ? '<button class="btn ghost" id="sDbOff">ตัดการเชื่อมต่อ</button>' : ''}</div></div>
     <div class="set-sec"><h4>ความปลอดภัย</h4>
       <label class="field"><span>ล็อกอัตโนมัติเมื่อไม่ได้ใช้งาน (นาที, 0 = ปิด)</span><input class="inp" id="sLock" type="number" min="0" max="120" value="${pref.lock}"></label>
       <label class="field"><span>ล้างคลิปบอร์ดหลังคัดลอก (วินาที, 0 = ไม่ล้าง)</span><input class="inp" id="sClip" type="number" min="0" max="300" value="${pref.clip}"></label>
-      <div class="set-row"><button class="btn ghost" id="sPw">เปลี่ยนPIN</button><button class="btn danger" id="sWipe">ล้างข้อมูลในเครื่องนี้</button></div></div>`);
-  const B = $('#sheetB');
-  $('#sGen').onclick = generatorSheet; $('#sHealth').onclick = healthSheet; $('#sExp').onclick = exportFile; $('#sImp').onclick = importBackupFlow; $('#sBulk').onclick = bulkImportSheet;
+      <div class="set-row"><button class="btn ghost" id="sPw">เปลี่ยน PIN</button><button class="btn danger" id="sWipe">ล้างข้อมูลในเครื่องนี้</button></div></div>`);
+  $('#sGen').onclick = generatorSheet; $('#sHealth').onclick = healthSheet; $('#sCats').onclick = catSheet; $('#sExp').onclick = exportFile; $('#sImp').onclick = importBackupFlow; $('#sBulk').onclick = bulkImportSheet;
   $('#sLock').onchange = e => { lsSet('vault.lockMin', String(Math.max(0, +e.target.value||0))); armLock(); toast('บันทึกแล้ว'); };
   $('#sClip').onchange = e => { lsSet('vault.clipSec', String(Math.max(0, +e.target.value||0))); toast('บันทึกแล้ว'); };
   $('#sPw').onclick = changeMaster; $('#sDb').onclick = migrateSheet;
   const off = $('#sDbOff'); if (off) off.onclick = () => { lsSet('vault.url',''); lsSet('vault.key',''); S.syncId = null; setSync('', 'ในเครื่อง'); toast('ตัดการเชื่อมต่อแล้ว — ข้อมูลยังอยู่ในเครื่อง'); settingsSheet(); };
-  $('#sWipe').onclick = async () => { if (await dialog({ title:'ล้างข้อมูลในเครื่องนี้?', text:'จะลบวอลต์ที่เก็บในเบราว์เซอร์นี้ทั้งหมด (ไฟล์สำรองที่ส่งออกไว้ไม่ถูกลบ)\nแน่ใจว่าสำรองไว้แล้ว', ok:'ล้างเลย', danger:true })){ ['vault.file','vault.dirty','vault.synced'].forEach(lsDel); location.reload(); } };
+  $('#sWipe').onclick = async () => { if (await dialog({ title:'ล้างข้อมูลในเครื่องนี้?', text:'จะลบวอลต์ที่เก็บในเบราว์เซอร์นี้ทั้งหมด (ไฟล์สำรองที่ส่งออกไว้และข้อมูลบนฐานข้อมูลไม่ถูกลบ)\nแน่ใจว่าสำรองไว้แล้ว', ok:'ล้างเลย', danger:true })){ await clearLocal(); ['vault.dirty','vault.synced'].forEach(lsDel); location.reload(); } };
 }
 function migrateSheet(){
   openSheet('ย้าย / เชื่อมฐานข้อมูล', `<p style="color:var(--muted);font-size:13.5px;margin:0 0 14px">รันไฟล์ <b>supabase-sync.sql</b> ในฐานข้อมูลปลายทางก่อน (Supabase → SQL Editor → Run) แล้วใส่ค่าด้านล่าง ระบบจะส่งข้อมูลที่เข้ารหัสแล้วไปให้</p>
@@ -854,20 +1030,21 @@ function migrateSheet(){
     lsSet('vault.url', u); lsSet('vault.key', k);
     try { S.syncId = VAULT_ID; const rem = await remoteGet();
       if (rem){ let rv; try { rv = await unseal(rem, await keysFor(S.pwHold, rem)); } catch { throw new Error('ปลายทางมีข้อมูลที่ใช้ PIN อื่นอยู่แล้ว — ไม่ย้ายเพื่อกันข้อมูลทับ'); } S.vault = mergeVaults(S.vault, rv); }
-      S.file = await seal(S.keys, S.vault); lsSet('vault.file', JSON.stringify(S.file)); await remotePut(S.file); lsDel('vault.dirty'); S.dirty = false; setSync('ok','ซิงค์แล้ว'); closeSheet(); toast('ย้ายข้อมูลเรียบร้อย ✓', 3500); }
+      S.file = await seal(S.keys, S.vault); await saveLocal(JSON.stringify(S.file)); await remotePut(S.file); lsDel('vault.dirty'); S.dirty = false; setSync('ok','ซิงค์แล้ว'); closeSheet(); toast('ย้ายข้อมูลเรียบร้อย ✓', 3500); }
     catch(e){ if (old[0] === null) lsDel('vault.url'); else lsSet('vault.url', old[0]); if (old[1] === null) lsDel('vault.key'); else lsSet('vault.key', old[1]); S.syncId = oldId; toast('ย้ายไม่สำเร็จ: ' + e.message, 5000); }
   };
 }
 async function changeMaster(){
-  const cur = await dialog({ title:'PINปัจจุบัน', input:'PINเดิม', type:'password', ok:'ต่อไป' }); if (cur === null) return;
-  if (cur !== S.pwHold){ toast('PINเดิมไม่ถูกต้อง'); return; }
-  const n1 = await dialog({ title:'PINใหม่', text:'ยาว 10 ตัวขึ้นไปหรือเป็นวลีหลายคำจะปลอดภัยกว่า', input:'PINใหม่', type:'password', ok:'ต่อไป' }); if (!n1) return;
+  const cur = await dialog({ title:'PIN ปัจจุบัน', input:'PIN เดิม', type:'password', ok:'ต่อไป' }); if (cur === null) return;
+  if (cur !== S.pwHold){ toast('PIN เดิมไม่ถูกต้อง'); return; }
+  const n1 = await dialog({ title:'PIN ใหม่', text:'ยาว 10 ตัวขึ้นไปหรือเป็นวลีหลายคำจะปลอดภัยกว่า', input:'PIN ใหม่', type:'password', ok:'ต่อไป' }); if (!n1) return;
   if (n1.length < 4){ toast('สั้นเกินไป (อย่างน้อย 4 ตัว)'); return; }
-  const n2 = await dialog({ title:'ยืนยันรหัสใหม่', input:'พิมพ์อีกครั้ง', type:'password', ok:'เปลี่ยนรหัส' }); if (n2 !== n1){ toast('รหัสไม่ตรงกัน'); return; }
-  S.keys = await deriveKeys(n1, crypto.getRandomValues(new Uint8Array(16)), ITER); S.pwHold = n1;
-  const oldId = S.syncId; await ensureSyncId(); await persist();
-  if (oldId && oldId !== S.syncId && cfg.url){ try { await fetch(`${cfg.url}/rest/v1/vault_blobs?id=eq.${oldId}`, { method:'DELETE', headers:{ apikey:cfg.key, Authorization:'Bearer '+cfg.key, 'x-vault-id': oldId } }); } catch {} }
-  toast('เปลี่ยนPINแล้ว — โปรดส่งออกไฟล์สำรองใหม่', 4500);
+  const n2 = await dialog({ title:'ยืนยัน PIN ใหม่', input:'พิมพ์อีกครั้ง', type:'password', ok:'เปลี่ยน PIN' }); if (n2 !== n1){ toast('PIN ไม่ตรงกัน'); return; }
+  // ซิงค์ให้ทันกันก่อน เพื่อไม่ให้ข้อมูลจากเครื่องอื่นหายตอนเขียนทับด้วย PIN ใหม่
+  if (syncOn() && !(await sync(true))){ toast('ต้องออนไลน์และซิงค์สำเร็จก่อนจึงจะเปลี่ยน PIN ได้', 5000); return; }
+  S.keys = await deriveKeys(n1, crypto.getRandomValues(new Uint8Array(16)), ITER); S.pwHold = n1; S.force = true;
+  await persist();
+  toast('เปลี่ยน PIN แล้ว — เครื่องอื่นใส่ PIN ใหม่ตอนเปิดครั้งหน้า', 5000);
 }
 $('#btnSet').onclick = settingsSheet;
 
@@ -880,16 +1057,16 @@ function armLock(){
 function lockNow(msg){
   clearTimeout(S.timer); clearTimeout(S.pushT);
   if (S.keys && S.dirty && syncOn()) sync(true);
-  S.keys = null; S.vault = null; S.pwHold = null; S.syncId = null; S.q = ''; S.filter = 'all'; S.group = '';
+  S.keys = null; S.vault = null; S.pwHold = null; S.syncId = null; S.q = ''; S.sec = 'all'; S.kind = ''; S.group = ''; closeLb();
   closeSheet(); $('#dlgRoot').innerHTML = ''; $('#grid').innerHTML = ''; $('#q').value = '';
   $('#app').classList.remove('on'); $('#lock').classList.remove('gone','opening');
-  setMode(lsGet('vault.file') ? 'unlock' : 'new'); if (msg) setTimeout(() => toast(msg), 300);
+  setMode(localFile() ? 'unlock' : 'new'); if (msg) setTimeout(() => toast(msg), 300);
 }
 $('#btnLock').onclick = () => lockNow();
 document.addEventListener('visibilitychange', () => { if (document.hidden && S.keys && lsGet('vault.hideLock') === '1') lockNow(); });
 
 function setMode(m){
-  S.mode = m; const has = !!lsGet('vault.file');
+  S.mode = m; const has = !!localFile();
   const dbOn = !!(cfg.url && cfg.key);
   const step = m === 'new' && (S.forceDb || (!dbOn && lsGet('vault.skipdb') !== '1')) ? 'db' : 'pin'; S.forceDb = false; S.step = step;
   const isDb = m === 'new' && step === 'db', isPin = m === 'new' && step === 'pin';
@@ -949,7 +1126,7 @@ async function enter(){
   $('#lock').classList.add('opening');
   await wait(550);
   $('#lock').classList.add('gone'); $('#app').classList.add('on');
-  S.filter = 'all'; render(); armLock();
+  S.sec = 'all'; S.kind = ''; render(); armLock();
   await ensureSyncId(); if (syncOn()) sync(true); else setSync('', 'ในเครื่อง');
   const last = +lsGet('vault.backup','0'), days = last ? (Date.now()-last)/86400000 : null;
   if (S.vault.entries.length && (days === null || days > 30)) setTimeout(() => toast(days === null ? 'ยังไม่เคยสำรอง — ตั้งค่า → ส่งออกไฟล์เข้ารหัส' : `ไม่ได้สำรองมา ${Math.floor(days)} วันแล้ว`, 5000), 1200);
@@ -960,13 +1137,22 @@ $('#lockForm').onsubmit = async ev => {
   ev.preventDefault(); if (busy) return;
   if (S.mode === 'new' && S.step === 'db'){ busy = true; try { await connectDb(); } finally { busy = false; } return; }
   const pw = $('#pw').value, btn = $('#lockBtn'), label = btn.textContent; $('#lockErr').textContent = '';
-  if (!pw){ fail('กรุณาใส่PIN'); return; }
+  if (!pw){ fail('กรุณาใส่ PIN'); return; }
   busy = true; btn.disabled = true; btn.textContent = 'กำลังตรวจสอบ…'; await wait(30);
   try{
     if (S.mode === 'unlock'){
-      const file = JSON.parse(lsGet('vault.file')); const keys = await keysFor(pw, file);
-      let v; try { v = await unseal(file, keys); } catch { fail('PINไม่ถูกต้อง'); return; }
-      Object.assign(S, { keys, vault: v, file, pwHold: pw, dirty: lsGet('vault.dirty') === '1' }); await enter();
+      let file = JSON.parse(localFile()), keys = await keysFor(pw, file), v, viaCloud = false;
+      try { v = await unseal(file, keys); }
+      catch {
+        // อาจเปลี่ยน PIN จากเครื่องอื่นไว้ -> ลองเปิดข้อมูลบนฐานข้อมูลด้วย PIN นี้ (เฉพาะเมื่อในเครื่องไม่มีงานที่ยังไม่ซิงค์)
+        if (cfg.url && cfg.key && lsGet('vault.dirty') !== '1'){
+          try { S.syncId = VAULT_ID; const rem = await remoteGet(); if (rem){ const k2 = await keysFor(pw, rem); v = await unseal(rem, k2); file = rem; keys = k2; viaCloud = true; await saveLocal(JSON.stringify(rem)); } } catch {}
+          S.syncId = null;
+        }
+        if (!v){ fail('PIN ไม่ถูกต้อง'); return; }
+      }
+      Object.assign(S, { keys, vault: v, file, pwHold: pw, dirty: !viaCloud && lsGet('vault.dirty') === '1' }); await enter();
+      if (viaCloud) toast('ใช้ PIN ใหม่ — ดึงข้อมูลล่าสุดจากฐานข้อมูลแล้ว ✓', 4000);
     } else if (S.mode === 'new'){
       if (pw.length < 4){ fail('PIN ต้องมีอย่างน้อย 4 ตัว (ยาวกว่านี้ปลอดภัยกว่า)'); return; }
       const dbOn = !!(cfg.url && cfg.key);
@@ -976,16 +1162,16 @@ $('#lockForm').onsubmit = async ev => {
         if (S.remote){
           const remote = S.remote, keys = await keysFor(pw, remote); let v;
           try { v = await unseal(remote, keys); } catch { fail('PIN ไม่ถูกต้อง'); return; }
-          Object.assign(S, { keys, vault: v, file: remote, pwHold: pw }); lsSet('vault.file', JSON.stringify(remote)); await enter(); toast('เปิดข้อมูลเดิมจากฐานข้อมูลแล้ว ✓'); return;
+          Object.assign(S, { keys, vault: v, file: remote, pwHold: pw }); await saveLocal(JSON.stringify(remote)); await enter(); toast('เปิดข้อมูลเดิมจากฐานข้อมูลแล้ว ✓'); return;
         }
       }
       if (pw !== $('#pw2').value){ fail('PIN สองช่องไม่ตรงกัน'); return; }
-      if (lsGet('vault.file') && !await dialog({ title:'มีวอลต์เดิมอยู่แล้ว', text:'การสร้างใหม่จะทับวอลต์ในเครื่องนี้ ดำเนินการต่อ?', ok:'ทับเลย', danger:true })) return;
+      if (localFile() && !await dialog({ title:'มีวอลต์เดิมอยู่แล้ว', text:'การสร้างใหม่จะทับวอลต์ในเครื่องนี้ ดำเนินการต่อ?', ok:'ทับเลย', danger:true })) return;
       const keys = await deriveKeys(pw, crypto.getRandomValues(new Uint8Array(16)), ITER);
       Object.assign(S, { keys, vault: emptyVault(), pwHold: pw, syncId: dbOn ? VAULT_ID : null }); await persist(); await enter();
     } else if (S.mode === 'file'){
       const f = $('#lockFile').files[0]; if (!f){ fail('เลือกไฟล์ก่อน'); return; }
-      let r; try { r = await openAnyBackup(await readFileText(f), pw); } catch(e){ fail(e.message === 'bad-password' ? 'PINไม่ถูกต้อง' : e.message); return; }
+      let r; try { r = await openAnyBackup(await readFileText(f), pw); } catch(e){ fail(e.message === 'bad-password' ? 'PIN ไม่ถูกต้อง' : e.message); return; }
       if (r.vault){ Object.assign(S, { keys: r.keys, vault: r.vault, file: r.file, pwHold: pw }); await persist(); }
       else { const keys = await deriveKeys(pw, crypto.getRandomValues(new Uint8Array(16)), ITER); Object.assign(S, { keys, vault: emptyVault(), pwHold: pw }); S.vault.entries = r.legacy.entries; await persist(); if (r.legacy.skippedFiles) setTimeout(() => toast(`ข้ามไฟล์แนบ ${r.legacy.skippedFiles} รายการ (เวอร์ชันนี้เก็บเฉพาะข้อความ)`, 6000), 1500); }
       lsSet('vault.backup', String(Date.now())); await enter();
@@ -1001,12 +1187,13 @@ $('#syncChip').onclick = () => { if (!syncOn()) migrateSheet(); else sync(false)
 document.addEventListener('keydown', e => {
   if (!S.keys) return;
   const typing = /INPUT|TEXTAREA/.test(document.activeElement.tagName);
-  if (e.key === 'Escape'){ if ($('#dlg')) return; closeSheet(); }
+  if (e.key === 'Escape'){ if ($('#dlg')) return; if (!$('#lb').classList.contains('hidden')) closeLb(); else closeSheet(); }
+  else if (!$('#lb').classList.contains('hidden') && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) lbGo(e.key === 'ArrowLeft' ? -1 : 1);
   else if (!typing && e.key === '/'){ e.preventDefault(); $('#q').focus(); }
-  else if (!typing && e.key === 'n'){ e.preventDefault(); openEditor(); }
+  else if (!typing && e.key === 'n'){ e.preventDefault(); addPicker(); }
 });
 setTheme(lsGet('vault.theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
-setMode(lsGet('vault.file') ? 'unlock' : 'new');
+initLocal().then(() => setMode(localFile() ? 'unlock' : 'new'));
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 setTimeout(() => $('#splash').classList.add('gone'), 1700);
 </script>
