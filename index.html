@@ -310,8 +310,8 @@ input[type=range]{width:100%;accent-color:var(--accent);height:30px}
 
 <script>
 'use strict';
-const DEFAULT_SUPABASE_URL = 'https://rrdvjmsfbrvoellsiszz.supabase.co/rest/v1/';  // ใส่ URL ของ Supabase ตรงนี้ได้ จะได้ไม่ต้องกรอกบนมือถือ
-const DEFAULT_SUPABASE_KEY = 'sb_publishable_xOQRSJZnx2R9vJDy0u7pqA_YkE5j3jm';  // publishable/anon key (คีย์สาธารณะ ใส่ได้)
+const DEFAULT_SUPABASE_URL = '';  // ใส่ URL ของ Supabase ตรงนี้ได้ จะได้ไม่ต้องกรอกบนมือถือ
+const DEFAULT_SUPABASE_KEY = '';  // publishable/anon key (คีย์สาธารณะ ใส่ได้)
 
 /* ============================ helpers ============================ */
 const $ = s => document.querySelector(s);
@@ -413,7 +413,9 @@ function look(e){
 const avatar = (e, extra='') => { const a = look(e); return `<div class="av ${extra}" style="background:${a.bg}">${esc(a.ch)}</div>`; };
 
 const S = { keys:null, vault:null, file:null, filter:'all', group:'', q:'', mode:'unlock', pwHold:null, syncId:null, dirty:false, timer:null, pushT:null };
-const cfg = { get url(){ return (lsGet('vault.url') ?? DEFAULT_SUPABASE_URL).replace(/\/+$/,''); }, get key(){ return lsGet('vault.key') ?? DEFAULT_SUPABASE_KEY; } };
+// รับ URL ที่วางมาผิดรูปแบบได้ เช่น มี /rest/v1/ ต่อท้าย หรือไม่มี https:// -> ตัดเหลือแค่ https://xxxx.supabase.co
+const cleanUrl = v => { v = (v || '').trim(); if (!v) return ''; try { return new URL(/^https?:\/\//i.test(v) ? v : 'https://' + v).origin; } catch { return v.replace(/\/+$/,''); } };
+const cfg = { get url(){ return cleanUrl(lsGet('vault.url') ?? DEFAULT_SUPABASE_URL); }, get key(){ return (lsGet('vault.key') ?? DEFAULT_SUPABASE_KEY).replace(/\s+/g,''); } };
 const pref = { get lock(){ return +lsGet('vault.lockMin','5'); }, get clip(){ return +lsGet('vault.clipSec','30'); }, get glen(){ return +lsGet('vault.glen','16'); } };
 const emptyVault = () => ({ v:1, entries:[], del:{}, u:Date.now() });
 
