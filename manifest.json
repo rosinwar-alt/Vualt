@@ -1,17 +1,14 @@
 {
-  "name": "Vault Ledger",
-  "short_name": "Vault Ledger",
-  "description": "ที่เก็บพาสเวิดและไฟล์ส่วนตัว เข้ารหัสฝั่งเบราว์เซอร์",
+  "name": "Vault",
+  "short_name": "Vault",
+  "description": "ที่เก็บรหัสผ่านส่วนตัว เข้ารหัสในเครื่อง",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#14171c",
-  "theme_color": "#14171c",
-  "orientation": "portrait-primary",
+  "background_color": "#0b0d14",
+  "theme_color": "#0b0d14",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }
